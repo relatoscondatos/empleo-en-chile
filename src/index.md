@@ -78,7 +78,7 @@ function buildChart() {
   //return dataPlotLast;
   return Plot.plot({
     width,
-    marginLeft: 80,
+    marginLeft: 30,
     marginRight: 120,
     y: { grid: true, tickFormat: ".0s" },
     color: {
