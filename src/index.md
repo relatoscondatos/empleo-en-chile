@@ -3,22 +3,31 @@ sql:
   ene: data/ene.parquet
 ---
 # Empleo en Chile 2.0
-```js
-buildChart()
-```
 
-```js
-ditribucionCifras(2024)
-```
+ 
+<div class="card">
+<h2>Evolución de cifras</h2>
+${buildChart()}
+</div>
 
-```js
-ditribucionOcupados(2024)
-```
+ 
+<div class="card">
+<h2>Distribución población</h2>
+${ditribucionCifras(2024)}
+</div>
 
 
-```js
-distribucionCambioOcupados({})
-```
+<div class="card">
+<h2>Distribución personas Ocupadas</h2>
+${ditribucionOcupados(2024)}
+</div>
+
+
+<div class="card">
+<h2>Cambios anuales</h2>
+${distribucionCambioOcupados({})}
+</div>
+
 
 ```js
 function buildChart() {
@@ -70,7 +79,7 @@ function buildChart() {
   return Plot.plot({
     width,
     marginLeft: 80,
-    marginRight: 200,
+    marginRight: 120,
     y: { grid: true, tickFormat: ".0s" },
     color: {
       range: [
@@ -376,7 +385,7 @@ function ditribucionOcupados(año) {
     title: `Cifras detalle de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
     width,
     height: 300,
-    marginLeft: 100,
+    marginLeft: 75,
     marginRight: 0,
     x: { tickFormat: "s", domain: [0, maxValue] },
     y: {
@@ -584,7 +593,7 @@ function distribucionCambioOcupados(options) {
 
     width,
     height: 300,
-    marginLeft: 100,
+    marginLeft: 75,
     marginRight: 0,
     x: { tickFormat: "s", domain: [0, maxValue] },
     y: {
