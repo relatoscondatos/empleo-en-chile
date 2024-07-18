@@ -88,9 +88,9 @@ function buildChart() {
 
   //return dataPlotLast;
   return Plot.plot({
-    width,
+    //width,
     marginLeft: 30,
-    marginRight: 120,
+    marginRight: 80,
     y: { grid: true, tickFormat: ".0s" },
     color: {
       range: [
@@ -171,7 +171,7 @@ function ditribucionCifras(año) {
     width,
     height: 300,
     marginLeft: 10,
-    marginRight: 80,
+    marginRight: 10,
     x: { tickFormat: "s", domain: [0, maxValue] },
     y: {
       tickSize: 0,
@@ -394,7 +394,7 @@ function ditribucionOcupados(año) {
 
   return Plot.plot({
     //title: `Cifras detalle de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
-    width,
+    //width,
     height: 300,
     marginLeft: 75,
     marginRight: 0,
@@ -604,7 +604,7 @@ function distribucionCambioOcupados(options) {
     } Trimestre ${etiquetasTrimestres[mes]}`,
     */
 
-    width,
+    //width,
     height: 300,
     marginLeft: 75,
     marginRight: 0,
