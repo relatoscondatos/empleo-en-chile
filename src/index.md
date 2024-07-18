@@ -4,28 +4,38 @@ sql:
 ---
 # Empleo en Chile
 
+```js
+const añoReferencia = 2024;
+const mesReferencia = 4;
+const etiquetaMesReferencia = etiquetasTrimestres[mes];
+
+```
+
 <div class="card">
 <h2>Distribución población</h2>
-${ditribucionCifras(2024)}
+<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mes]}</h3>
+
+${ditribucionCifras(añoReferencia)}
 </div>
 
- 
 <div class="card">
 <h2>Evolución de cifras</h2>
+<h3>Se indican cifras para trimestre ${etiquetasTrimestres[mes]} de cada año</h3>
+
 ${buildChart()}
 </div>
 
- 
-
-
 <div class="card">
 <h2>Distribución personas Ocupadas</h2>
-${ditribucionOcupados(2024)}
+<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mes]}</h3>
+
+${ditribucionOcupados(añoReferencia)}
 </div>
 
-
 <div class="card">
-<h2>Cambios anuales</h2>
+<h2>Cambios en ocupación</h2>
+<h3>${añoReferencia} vs ${añoReferencia - 1}  - Trimestre ${etiquetasTrimestres[mes]}</h3>
+
 ${distribucionCambioOcupados({})}
 </div>
 
@@ -157,7 +167,7 @@ function ditribucionCifras(año) {
     .value();
 
   return Plot.plot({
-    title: `Cifras de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
+    //title: `Cifras de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
     width,
     height: 300,
     marginLeft: 10,
@@ -383,7 +393,7 @@ function ditribucionOcupados(año) {
   };
 
   return Plot.plot({
-    title: `Cifras detalle de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
+    //title: `Cifras detalle de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
     width,
     height: 300,
     marginLeft: 75,
@@ -588,9 +598,11 @@ function distribucionCambioOcupados(options) {
   };
 
   return Plot.plot({
+    /*
     title: `Cambio en ocupación - ${añoReferencia} vs ${
       añoReferencia - 1
     } Trimestre ${etiquetasTrimestres[mes]}`,
+    */
 
     width,
     height: 300,
