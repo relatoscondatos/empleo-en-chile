@@ -1,547 +1,711 @@
 ---
 sql:
-  defuncionesPorComuna: data/defuncionesPorComuna.parquet
-  defuncionesChilePorEdad: data/defuncionesChilePorEdad.parquet
-  defuncionesPorComunaEdad: data/defuncionesPorComunaEdad.parquet
-  statsPorComuna: data/percentilesPorComuna.parquet
+  ene: data/ene.parquet
 ---
-# ¿La edad en que morimos depende de dónde vivimos?
-## Explorando las desigualdades en la edad de defunción en Chile
-
-## Distribución de edad de defunción en Chile
-
-Esta página utiliza datos de las defunciones en Chile entre 2014 y 2023 (10 años), publicados por el Departamento de Estadísticas e Información en Salud (DEIS) del Ministerio de Salud de Chile.
-
-
-<div class="grid grid-cols-1">
-  <div class="card grid-colspan-1">
-  <h2>Distribución de edad de defunciones en Chile</h2>
-  <h3>Datos de años 2014 a 2023</h3>
-
-  ${
-    resize((width) =>
-      buildChartCurve(dataDefuncionesChilePorEdad.toArray(),{
-      p50:statsChile.p50, 
-      p25:statsChile.p25, 
-      p75:statsChile.p75, 
-      max:maxChile,
-      mark:null,
-      width:640,
-      height:320
-})
-    ) 
-  }
-  </div>  
-  </div>  
-
-La curva de distribución muestra cómo se agrupa una mayor cantidad de personas fallecidas en edades más avanzadas.
-
-Ordenamos a todas las personas fallecidas por edad y las dividimos en dos grupos iguales; la **mediana** es la edad que divide al 50% con mayor edad y al 50% con menor edad. En Chile, la **mediana** de la edad de fallecimiento es de ${statsChile.p50} años.
-
-También podemos dividir la población en cuatro grupos (25% cada uno) y obtener así los cuartiles. El **primer cuartil** (percentil 25) incluye a las personas que fallecieron a una edad menor a ${statsChile.p25} años, y el **tercer cuartil** (percentil 75) incluye a las personas que fallecieron a una edad menor a ${statsChile.p75} años.
-
-
-<div class="grid grid-cols-2">
- 
-  <div class="card">
-  <h2>Mediana</h2>
-  <h3>Edad de defunciones en Chile</h3>
-  ${
-    resize((width) =>
-      buildChartCurve(dataDefuncionesChilePorEdad.toArray(),{
-      p50:statsChile.p50, 
-      p25:statsChile.p25, 
-      p75:statsChile.p75, 
-      max:maxChile,
-      mark:"median",
-      width:640,
-      height:320
-})
-    ) 
-  }
-  </div>
-  <div class="card">
-  <h2>Cuartiles</h2>
-  <h3>Edad de defunciones en Chile</h3>
-  ${
-    resize((width) =>
-      buildChartCurve(dataDefuncionesChilePorEdad.toArray(),{
-      p50:statsChile.p50, 
-      p25:statsChile.p25, 
-      p75:statsChile.p75, 
-      max:maxChile,
-      mark:"quartiles",
-      width:640,
-      height:320
-})
-    ) 
-  }
-  </div>
-</div>
-
-Una manera alternativa de sintetizar cómo se distribuyen las edades es con una barra que representa el rango entre el primer cuartil (25%) y el tercer cuartil (75%). Dentro de la barra se indica la mediana.
-
-<div class="grid grid-cols-2">
- 
-  <div class="card">
-  <h2>Distribución de fallecimientos en Chile</h2>
-  <h3>Mediana y rango entre el primer cuartil (25%) y el tercer cuartil (75%)</h3>
-  ${buildBoxes([statsChile])}
-  </div>
-
-</div>
-
-## Distribución de edad de defunción por comunas
-
-A nivel comunal, muchas comunas tienen una distribución similar a la nacional. A continuación se ilustra la distribución de algunas capitales regionales que son muy similares a la distribución nacional. Sin embargo, otras capitales regionales se distancian más de la distribución nacional.
-
-<div class="grid grid-cols-2">
- 
-  <div class="card">
-  <h2>Capitales Regionales con distribución similar a Chile</h2>
-  ${buildBoxes(statsCapitalesRegionales.filter(d => (d.p50 >= statsChile.p50-1) && (d.p50 <= statsChile.p50+1)))}
-  </div>
-  <div class="card">
-  <h2>Capitales Regionales con distribución distinta a Chile</h2>
-  ${buildBoxes(statsCapitalesRegionales.filter(d => (d.p50 < statsChile.p50-1) || (d.p50 > statsChile.p50+1) || d.comuna == "Chile"))}
-  </div>
-
-
-</div>
-
-
-Si observamos todas las comunas (excluyendo las más pequeñas, con menos de 1000 defunciones en 10 años), vemos que hay algunas con una mediana **considerablemente más alta que la nacional** (por ejemplo, ${_.chain([...statsComunasTop]).sortBy(d => +d.p75).sortBy(d => +d.p50).reverse().slice(0,5).map(d => d.comuna).value().join(",")}) y otras con una mediana **considerablemente menor a la nacional** (por ejemplo, ${_.chain([...statsComunasBottom]).sortBy(d => +d.p75).sortBy(d => +d.p50).slice(0,5).map(d => d.comuna).value().join(",")}).
-
-<div class="grid grid-cols-2">
- 
-  <div class="card">
-  <h2>Comunas con mayor edad de fallecimiento</h2>
-  ${buildBoxes(statsComunasTop)}
-  </div>
-
-  <div class="card">
-  <h2>Comunas con menor edad de fallecimiento</h2>
-  ${buildBoxes(statsComunasBottom)}
-  </div>
-</div>
-
-
-
-## Consulta por una comuna
-
-Aquí puedes seleccionar una comuna, observar su distribución y compararla con la distribución nacional.
+# Empleo en Chile 2.0
 ```js
-const comuna = view(Inputs.select(_.map(dataComunas.toArray(),d => d.comuna), { label: "Comuna"}));
+buildChart()
 ```
 
-<div class="grid grid-cols-2">
-  <div class="card">
-  <h2>Mediana</h2>
-    <h3>Edad de defunciones en ${comuna}</h3>
-
-  ${
-    resize((width) =>
-      buildChartCurve(dataComuna,{
-      p50:statsComuna.p50, 
-      p25:statsComuna.p25, 
-      p75:statsComuna.p75, 
-      max:maxChile,
-      mark:"median",
-      width:640,
-      height:320
-})
-    ) 
-  }
-  </div>
-    <div class="card">
-      <h2>Cuartiles</h2>
-      <h3>Edad de defunciones en ${comuna}</h3>
-
-  ${
-    resize((width) =>
-      buildChartCurve(dataComuna,{
-      p50:statsComuna.p50, 
-      p25:statsComuna.p25, 
-      p75:statsComuna.p75, 
-      max:maxChile,
-      mark:"quartiles",
-      width:640,
-      height:320
-})
-    ) 
-  }
-  </div>
-</div>
-
-${comparaciónConChile(statsComuna, statsChile)}
-
-<div class="grid grid-cols-2">
-
-  <div class="card">
-  <h2>${comuna}</h2>
-  ${buildBoxes(statsComunaMasChile)}
-  </div>
-
-</div>
-
-## Determinantes sociales de la salud
-### Posible explicación de las diferencias
-
-La OMS indica que *"Los determinantes sociales de la salud (DSS) son los factores no médicos que influyen en los resultados de salud. Son las condiciones en las que las personas nacen, crecen, trabajan, viven y envejecen, y el conjunto más amplio de fuerzas y sistemas que moldean las condiciones de la vida diaria." (OMS, 2024)* 
-
-Ejemplos de determinantes sociales de la salud:
-* Ingreso y protección social
-* Educación
-* Desempleo e inseguridad laboral
-* Condiciones de vida laboral
-* Inseguridad alimentaria
-* Vivienda, servicios básicos y medio ambiente
-* Desarrollo en la primera infancia
-* Inclusión social y no discriminación
-* Conflicto estructural
-* Acceso a servicios de salud asequibles y de calidad decente
-
-Según la OMS, *numerosos estudios sugieren que los DSS representan **entre el 30% y el 55%** de los resultados de salud.*
-
-Más información sobre ***Determinandes sociales de la salud***: 
-* [Social determinants of health, OMS](https://www.who.int/health-topics/social-determinants-of-health)
-* [Determinantes sociales de la salud, OPS](https://www.paho.org/es/temas/determinantes-sociales-salud)
-* [Social determinants of health: the solid facts, 2nd ed, OMS](https://iris.who.int/handle/10665/326568)
-* [Fair Society, Healthy Lives (The Marmot Review)](https://www.instituteofhealthequity.org/resources-reports/fair-society-healthy-lives-the-marmot-review)
-* [Marmot Review 10 Years On](https://www.instituteofhealthequity.org/resources-reports/marmot-review-10-years-on)
-
-
- <div class="card">
-  <h2>Fuente de datos</h2>
-Departamento de Estadísticas e Información de Salud,  Ministerio de Salud, "Defunciones por Causa"  
-
-* Datos Abiertos | Defunciones
-https://deis.minsal.cl/#datosabiertos
-
-* [Defunciones por Causa 1990 - 2021 CIFRAS OFICIALES](https://repositoriodeis.minsal.cl/DatosAbiertos/VITALES/DEFUNCIONES_FUENTE_DEIS_1990_2021_CIFRAS_OFICIALES.zip)
-* Defunciones por Causa 2022 - 2024 CIFRAS PRELIMINARES (Actualización semanal):(*Enlace actualizado semanalmente*)  
-
-Organización Mundial de la Salud (OMS). "Social determinants of health." Consultado el 16 de julio de 2024. https://www.who.int/health-topics/social-determinants-of-health.
-
-  </div>
-
+```js
+ditribucionCifras(2024)
+```
 
 ```js
-const maxChile = _.chain(dataDefuncionesChilePorEdad.toArray()).map(d => d.edad).value()
-
-const dataComuna = _.chain([...dataDefuncionesPorComunaEdad])
-      .filter((d) => d.comuna == comuna)
-      .sortBy((d) => d.edad)
-      .value()
-
-const statsCapitalesRegionales = [...statsComunas].filter(d => d.comuna.match(/Chile$|Arica$|Iquique$|Antofagasta$|Copiapó$|La Serena$|Valparaíso$|Rancagua$|Talca$|Concepción$|Chillán$|Temuco$|Valdivia$|Puerto Montt$|Coihaique$|Punta Arenas/))
-
-const umbralDiferencia = 2;
+ditribucionOcupados(2024)
 ```
 
 
 ```js
-/*
-* buildChartCurve
-*/
-function buildChartCurve(data,options) {
-  const comuna = (options && options.comuna) || "Chile";
-  const sexo = (options && options.sexo) || null;
-  const mark = (options && options.mark) || null;
-  const title = (options && options.title) || null;
-  const subtitle = (options && options.subtitle) || null;
-  const p50 = (options && options.p50) || null;
-  const p25 = (options && options.p25) || null;
-  const p75 = (options && options.p75) || null;
-  const width = (options && options.width) || 640;
-  const height = (options && options.height) || width/2;
+distribucionCambioOcupados({})
+```
 
-  const dataPlot = data;
-
-  const maxX = (options && options.max) || _.chain(dataPlot)
-    .map((d) => d.edad)
-    .max()
+```js
+function buildChart() {
+  const dataPlot = _.chain([...dataTrends])
+    .map((d) => [
+      {
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Ocupadas",
+        personas: d.O,
+        topline: d.O
+      },
+      {
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Desocupadas",
+        personas: d.DO,
+        topline: d.O + d.DO
+      },
+      {
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Inactivas",
+        personas: d.PET - d.O - d.DO,
+        topline: d.PET
+      },
+      {
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Menores de 15 años",
+        personas: d.personas - d.PET,
+        topline: d.personas
+      }
+    ])
+    .flatten()
     .value();
 
-   const maxY =  _.chain(dataPlot)
-    .map((d) => d.defunciones)
-    .max()
-    .value();;
+  const dataPlotLast = dataPlot.filter((d) => d.año == 2024 && d.mes == 4);
 
+  const lineasTrimestre = _.chain(_.range(2019, 2025))
+    .map((año) => moment(`${año}-${4}`, "YYYY-M").toDate())
+    .value();
 
-  
-  const data_25_75 = dataPlot.filter(
-    (d) => d.edad >= p25 && d.edad <= p75
-  );
-  
-
-  const medianMark = [
-    Plot.ruleX([p50], {stroke:"#DDD", strokeWidth:3}),
-    Plot.text([p50], {
-      x: (d) => d,
-      y: d => maxY,
-      dy: -10,
-      text: (d) => d,
-      fill:"black",
-      fontSize: 18
-
-    }),
-    Plot.text([p50], {
-      x: (d) => d,
-      y: 0,
-      dy: -15,
-      dx: -10,
-      text: (d) => "50%",
-      textAnchor: "end",
-      fontSize: 18,
-
-      fill: "white"
-    }),
-    Plot.text([p50], {
-      x: (d) => d,
-      y: 0,
-      dy: -15,
-      dx: 10,
-      text: (d) => "50%",
-      textAnchor: "start",
-      fontSize: 18,
-      fill: "white"
-    })
-  ];
-
-  const quartilesMark = [
-    Plot.areaY(data_25_75, {
-      x: "edad",
-      y: "defunciones",
-      fill: (d) => "intercuartil",
-      opacity: 1
-    }),
-
-    Plot.ruleX([p25, p50, p75]),
-    Plot.text([p25, p50, p75], {
-      x: (d) => d,
-      y: maxY,
-      dy: -10,
-      text: (d) => d,
-      fontSize: 18
-
-    }),
-    Plot.text([(p25 + p50) / 2, (p75 + p50) / 2], {
-      x: (d) => d,
-      y: 0,
-      dy: -10,
-      text: (d) => "25%",
-      fill: "white",
-      fontSize: 18
-    }),
-    Plot.text([p25], {
-      x: (d) => d,
-      y: 0,
-      dy: -10,
-      dx: -10,
-      text: (d) => "25%",
-      textAnchor: "end",
-      fill: "white",
-      fontSize: 18
-    }),
-    Plot.text([p75], {
-      x: (d) => d,
-      y: 0,
-      dy: -10,
-      dx: 10,
-      text: (d) => "25%",
-      textAnchor: "start",
-      fill: "white",
-      fontSize: 18
-    })
-  ];
-
+  //return dataPlotLast;
   return Plot.plot({
     width,
-    height,
-    title,
-    subtitle,
-    marginLeft: 50,
-    x:{domain:[0,120]},
-    //color: { range: colorCuartiles },
+    marginLeft: 80,
+    marginRight: 200,
+    y: { grid: true, tickFormat: ".0s" },
+    color: {
+      range: [
+        d3.schemeTableau10[0],
+        d3.schemeTableau10[1],
+        d3.schemeTableau10[2],
+        "lightgrey"
+      ]
+    },
     marks: [
-      Plot.areaY(dataPlot, {
-        x: "edad",
-        y: "defunciones",
-        fill: (d) => "curva",
-        opacity: 1
-      }),
+      Plot.ruleY([0]),
 
-      Plot.lineY(dataPlot, {
-        x: "edad",
-        y: "defunciones",
-        stroke: (d) => "curva",
-        opacity: 0,
-        tip:true,
-        title: d => `Edad: ${d.edad} \nDefunciones: ${d3.format(",")(d.defunciones)}`
-      }),
+      Plot.areaY(
+        dataPlot,
+        Plot.stackY({
+          y: "personas",
+          x: "date",
+          fill: "tipo"
+        })
+      ),
+      Plot.ruleX(lineasTrimestre),
 
-      mark == "median" ? medianMark  : mark == "quartiles" ? quartilesMark : []
+      Plot.text(
+        dataPlot.filter((d) => d.mes == 4 && !d.tipo.match(/kupados/)),
+        Plot.stackY({
+          y: "personas",
+          x: "date",
+          fill: (d) => (d.tipo == "Ocupadas" ? "black" : "white"),
+          text: (d) => d3.format(".3s")(d.personas),
+          textAnchor: "end",
+          dx: -1
+        })
+      ),
+      Plot.text(
+        dataPlotLast,
+        Plot.stackY({
+          y: "personas",
+          x: "date",
+          fill: (d) => (d.tipo == "Ocupadas" ? "black" : "black"),
+          text: "tipo",
+          textAnchor: "start",
+          dx: 10
+        })
+      )
     ]
   });
 }
 
-function buildBoxes(data, options) {
-  const dataPlot = data;
+function ditribucionCifras(año) {
+  const añoReferencia = año;
+  const maxValue = _.chain(dataCambios)
+    .map((d) => d.personas)
+    .max()
+    .value();
+  const dataAñoReferencia = _.chain(dataCambios)
+    .find((d) => d.año == añoReferencia)
+    .value();
+
+  const dataPlot = _.chain(dataAñoReferencia.metrics)
+    .map((metric) => ({
+      indicador: metric,
+      valor: dataAñoReferencia[metric],
+      cambio: dataAñoReferencia.cambioAnual[metric],
+      cambioPct:
+        dataAñoReferencia.cambioAnual[metric] /
+        (dataAñoReferencia[metric] - dataAñoReferencia.cambioAnual[metric])
+    }))
+    .filter(
+      (d) =>
+        !d.indicador.match(
+          /administracion|asalariados|extranjeros|ocupacion_informal|sector_informal/
+        )
+    )
+    .value();
 
   return Plot.plot({
-    marginLeft: 100,
-
-    x: {
-      domain: [50, 95]
-    },
-
-    y:{
-      domain: _.chain([...dataPlot]).sortBy(d => d.p75).sortBy(d => d.p50).map(d => d.comuna).reverse().value()
-    },
-    color: {
-      domain: ["comuna", "chile"],
-      //range: ["blue", "lightgrey"]
+    title: `Cifras de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
+    width,
+    height: 300,
+    marginLeft: 10,
+    marginRight: 80,
+    x: { tickFormat: "s", domain: [0, maxValue] },
+    y: {
+      tickSize: 0,
+      tickFormat: (d) => "",
+      domain: [
+        "Ocupados",
+        "Fuerza de Trabajo",
+        "Personas en Edad de Trabajar",
+        "Población Total"
+      ]
     },
     marks: [
-      Plot.barX(dataPlot, {
-        x1: (d) => d.p25,
-        x2: (d) => d.p75,
-        y: (d) => d.comuna,
-        fill: (d) =>
-          d.comuna !== "Chile" ? "comuna" : "chile"
-      }),
+      Plot.barX(
+        [{ tipo: "Población Total", personas: dataAñoReferencia.personas }],
+        {
+          x: "personas",
+          y: (d) => "Población Total",
+          fill: "tipo"
+        }
+      ),
+      Plot.text(
+        [{ tipo: "Población Total", personas: dataAñoReferencia.personas }],
+        Plot.stackX({
+          x: "personas",
+          y: (d) => "Población Total",
+          z: "tipo",
+          fill: "#EEE",
+          fontWeight: "bold",
+          text: (d) => `${d["tipo"]}\n${d3.format(".3s")(d["personas"])}`
+        })
+      ),
 
-      Plot.tickX(dataPlot, {
-        x: (d) => d.p50,
-        y: "comuna",
-        stroke: "black",
-        //sort: { y: "x" }
-      }),
-      Plot.barX(dataPlot, {
-        x1: (d) => d.p50 - 0.5,
-        x2: (d) => d.p50 + 0.5,
-        y: (d) => d.comuna,
-        insetTop: 5,
-        insetBottom: 5,
-        fill: "white"
-      }),
+      Plot.barX(
+        [
+          {
+            tipo: "Personas en Edad de Trabajar",
+            personas: dataAñoReferencia.PET
+          },
+          {
+            tipo: "Menores de 15 años",
+            personas: dataAñoReferencia.personas - dataAñoReferencia.PET
+          }
+        ],
+        {
+          x: "personas",
+          y: (d) => "Personas en Edad de Trabajar",
+          fill: "tipo"
+        }
+      ),
+      ,
+      Plot.text(
+        [
+          {
+            tipo: "Personas en Edad de Trabajar",
+            personas: dataAñoReferencia.PET
+          },
+          {
+            tipo: "Menores de 15 años",
+            personas: dataAñoReferencia.personas - dataAñoReferencia.PET
+          }
+        ],
+        Plot.stackX({
+          x: "personas",
+          y: (d) => "Personas en Edad de Trabajar",
+          z: "tipo",
+          fill: "#EEE",
+          fontWeight: "bold",
+          text: (d) => `${d["tipo"]}\n${d3.format(".3s")(d["personas"])}`
+        })
+      ),
 
-      Plot.text(dataPlot, {
-        x: (d) => d.p50,
-        y: "comuna",
-        fill: "black",
-        text: (d) => d.p50,
-        fontSize: 8
-      }),
-      Plot.text(dataPlot, {
-        x: (d) => d.p75,
-        y: "comuna",
-        fill: "black",
-        text: (d) => d.p75,
-        textAnchor: "start",
-        fontSize: 8
-      }),
-      Plot.text(dataPlot, {
-        x: (d) => d.p25,
-        y: "comuna",
-        fill: "black",
-        text: (d) => d.p25,
-        textAnchor: "end",
-        fontSize: 8
-      }),
-      Plot.ruleX([0])
+      Plot.barX(
+        [
+          { tipo: "Fuerza de Trabajo", personas: dataAñoReferencia.FT },
+          {
+            tipo: "Inactivas",
+            personas: dataAñoReferencia.PET - dataAñoReferencia.FT
+          }
+        ],
+        {
+          x: "personas",
+          y: (d) => "Fuerza de Trabajo",
+          fill: "tipo"
+        }
+      ),
+      Plot.text(
+        [
+          { tipo: "Fuerza de Trabajo", personas: dataAñoReferencia.FT },
+          {
+            tipo: "Inactivas",
+            personas: dataAñoReferencia.PET - dataAñoReferencia.FT
+          }
+        ],
+        Plot.stackX({
+          x: "personas",
+          y: (d) => "Fuerza de Trabajo",
+          z: "tipo",
+          fill: "#EEE",
+          fontWeight: "bold",
+          text: (d) => `${d["tipo"]}\n${d3.format(".3s")(d["personas"])}`
+        })
+      ),
+      Plot.barX(
+        [
+          { tipo: "Ocupados", personas: dataAñoReferencia.O },
+          { tipo: "Desocupados", personas: dataAñoReferencia.DO }
+        ],
+        {
+          x: "personas",
+          y: (d) => "Ocupados",
+          fill: "tipo"
+        }
+      ),
+      Plot.text(
+        [
+          { tipo: "Ocupados", personas: dataAñoReferencia.O },
+          { tipo: "Desocupados", personas: dataAñoReferencia.DO }
+        ],
+        Plot.stackX({
+          x: "personas",
+          y: (d) => "Ocupados",
+          z: "tipo",
+          fill: "#EEE",
+          fontWeight: "bold",
+          text: (d) => `${d["tipo"]}\n${d3.format(".3s")(d["personas"])}`
+        })
+      )
     ]
   });
 }
 
-function comparaciónConChile(statsComuna, statsChile) {
+function ditribucionOcupados(año) {
+  const añoReferencia = año;
+  const maxValue = _.chain(dataCambios)
+    .map((d) => d.O)
+    .max()
+    .value();
+  const dataAñoReferencia = _.chain(dataCambios)
+    .find((d) => d.año == añoReferencia)
+    .value();
 
-  let msg = `${statsComuna.comuna}`
-  if (statsComuna.p50 < statsChile.p50 - umbralDiferencia) {
-    msg += ` tiene una mediana (${statsComuna.p50}) menor a la de Chile (${statsChile.p50})`
-  } else if (statsComuna.p50 > statsChile.p50 + umbralDiferencia) {
-    msg += ` tiene una mediana (${statsComuna.p50}) por sobre la de Chile (${statsChile.p50})`
+  const dataPlot = _.chain(dataAñoReferencia.metrics)
+    .map((metric) => ({
+      indicador: metric,
+      valor: dataAñoReferencia[metric],
+      cambio: dataAñoReferencia.cambioAnual[metric],
+      cambioPct:
+        dataAñoReferencia.cambioAnual[metric] /
+        (dataAñoReferencia[metric] - dataAñoReferencia.cambioAnual[metric])
+    }))
+    .filter((d) => !d.indicador.match(/DO|personas|FT|PET|sector_informal/))
+    .value();
 
-  } else {
-    msg += ` tiene una mediana (${statsComuna.p50}) similar a la de Chile (${statsChile.p50})`
+  const dataSets = {
+    ocupados: [
+      { fila: "Ocupados", tipo: "Ocupados", personas: dataAñoReferencia.O }
+    ],
+    categoria: [
+      {
+        fila: "Categoria",
+        tipo: "Asalariados Sector Público",
+        personas: dataAñoReferencia.asalariados_sector_publico
+      },
+      {
+        fila: "Categoria",
+        tipo: "Otras categorías",
+        personas:
+          dataAñoReferencia.O - dataAñoReferencia.asalariados_sector_publico
+      }
+    ],
+    formalidad: [
+      {
+        fila: "Formalidad",
+        tipo: "Ocupación Informal",
+        personas: dataAñoReferencia.ocupacion_informal
+      },
+      {
+        fila: "Formalidad",
+        tipo: "Ocupación Formal",
+        personas: dataAñoReferencia.O - dataAñoReferencia.ocupacion_informal
+      }
+    ],
+    actividad: [
+      {
+        fila: "Actividad",
+        tipo: "Administración pública y defensa",
+        personas: dataAñoReferencia.administracion_publica
+      },
+      {
+        fila: "Actividad",
+        tipo: "Otras actividades",
+        personas: dataAñoReferencia.O - dataAñoReferencia.administracion_publica
+      }
+    ],
+    nacionalidad: [
+      {
+        fila: "Nacionalidad",
+        tipo: "Extranjera",
+        personas: dataAñoReferencia.extranjeros
+      },
+      {
+        fila: "Nacionalidad",
+        tipo: "Chilena",
+        personas: dataAñoReferencia.O - dataAñoReferencia.extranjeros
+      }
+    ],
+    sexo: [
+      {
+        fila: "Sexo",
+        tipo: "Hombres",
+        personas: dataAñoReferencia.hombres
+      },
+      {
+        fila: "Sexo",
+        tipo: "Mujeres",
+        personas: dataAñoReferencia.mujeres
+      }
+    ]
+  };
+
+  return Plot.plot({
+    title: `Cifras detalle de ocupación - ${añoReferencia} Trimestre ${etiquetasTrimestres[mes]}`,
+    width,
+    height: 300,
+    marginLeft: 100,
+    marginRight: 0,
+    x: { tickFormat: "s", domain: [0, maxValue] },
+    y: {
+      tickFormat: (d) => d,
+      domain: [
+        "Ocupados",
+        "Formalidad",
+        "Categoria",
+        "Actividad",
+        "Nacionalidad",
+        "Sexo"
+      ],
+      label: ""
+    },
+
+    marks: [
+      _.chain(dataSets)
+        .map((set, key) => [
+          Plot.barX(set, {
+            x: "personas",
+            y: "fila",
+            fill: "tipo"
+          }),
+          Plot.text(
+            set,
+            Plot.stackX({
+              x: "personas",
+              y: "fila",
+              z: "tipo",
+              fill: "#EEE",
+              fontWeight: "bold",
+              text: (d) => `${d["tipo"]}\n${d3.format(".3s")(d["personas"])}`
+            })
+          )
+        ])
+        .value()
+    ]
+  });
+}
+
+function distribucionCambioOcupados(options) {
+  const añoReferencia = (options && options.año) || 2024;
+  const mostrarPorcentaje = (options && options.mostrarPorcentaje) || false;
+  const dataAñoReferencia = _.chain(dataCambios)
+    .find((d) => d.año == añoReferencia)
+    .value();
+
+  const maxValue = dataAñoReferencia.cambioAnual.O;
+
+  function getCambio(record, attrUniverso, attrFoco) {
+    const cambio = attrUniverso
+      ? record.cambioAnual[attrUniverso] - record.cambioAnual[attrFoco]
+      : record.cambioAnual[attrFoco];
+
+    return cambio;
   }
 
-  return msg
+  function getCambioPct(record, attrUniverso, attrFoco) {
+    const cambio = attrUniverso
+      ? record.cambioAnual[attrUniverso] - record.cambioAnual[attrFoco]
+      : record.cambioAnual[attrFoco];
+
+    const valorActual = attrUniverso
+      ? record[attrUniverso] - record[attrFoco]
+      : record[attrFoco];
+
+    return cambio / (valorActual - cambio);
+  }
+
+  function buildLabel(d) {
+    const core = `${d["tipo"]}\n${d["personas"] > 0 ? "+" : ""}${d3.format(
+      ".3s"
+    )(d["personas"])}`;
+    const change = ` (${d["personas"] > 0 ? "+" : ""}${d3.format(".1%")(
+      d["porcentaje"]
+    )})`;
+    return mostrarPorcentaje ? core + change : core;
+  }
+
+  const dataSets = {
+    ocupados: [
+      {
+        fila: "Ocupados",
+        tipo: "Ocupados",
+        personas: dataAñoReferencia.cambioAnual.O,
+        test: getCambio(dataAñoReferencia, null, "O"),
+        porcentaje: getCambioPct(dataAñoReferencia, null, "O")
+      }
+    ],
+    categoria: [
+      {
+        fila: "Categoria",
+        tipo: "Asalariados Sector Público",
+        personas: dataAñoReferencia.cambioAnual.asalariados_sector_publico,
+        test: getCambio(dataAñoReferencia, null, "asalariados_sector_publico"),
+
+        porcentaje_:
+          dataAñoReferencia.cambioAnual.asalariados_sector_publico /
+          (dataAñoReferencia.asalariados_sector_publico -
+            dataAñoReferencia.cambioAnual.asalariados_sector_publico),
+        porcentaje: getCambioPct(
+          dataAñoReferencia,
+          null,
+          "asalariados_sector_publico"
+        )
+      },
+      {
+        fila: "Categoria",
+        tipo: "Otras categorías",
+        personas:
+          dataAñoReferencia.cambioAnual.O -
+          dataAñoReferencia.cambioAnual.asalariados_sector_publico,
+        test: getCambio(dataAñoReferencia, "O", "asalariados_sector_publico"),
+        porcentaje: getCambioPct(
+          dataAñoReferencia,
+          "O",
+          "asalariados_sector_publico"
+        )
+      }
+    ],
+    formalidad: [
+      {
+        fila: "Formalidad",
+        tipo: "Ocupación Informal",
+        personas: dataAñoReferencia.cambioAnual.ocupacion_informal,
+        test: getCambio(dataAñoReferencia, null, "ocupacion_informal"),
+        porcentaje: getCambioPct(dataAñoReferencia, null, "ocupacion_informal")
+      },
+      {
+        fila: "Formalidad",
+        tipo: "Ocupación Formal",
+        personas:
+          dataAñoReferencia.cambioAnual.O -
+          dataAñoReferencia.cambioAnual.ocupacion_informal,
+        test: getCambio(dataAñoReferencia, "O", "ocupacion_informal"),
+        porcentaje: getCambioPct(dataAñoReferencia, "O", "ocupacion_informal")
+      }
+    ],
+    actividad: [
+      {
+        fila: "Actividad",
+        tipo: "Administración pública y defensa",
+        personas: dataAñoReferencia.cambioAnual.administracion_publica,
+        test: getCambio(dataAñoReferencia, null, "administracion_publica"),
+        porcentaje: getCambioPct(
+          dataAñoReferencia,
+          null,
+          "administracion_publica"
+        )
+      },
+      {
+        fila: "Actividad",
+        tipo: "Otras actividades",
+        personas:
+          dataAñoReferencia.cambioAnual.O -
+          dataAñoReferencia.cambioAnual.administracion_publica,
+        test: getCambio(dataAñoReferencia, "O", "administracion_publica"),
+        porcentaje: getCambioPct(
+          dataAñoReferencia,
+          "O",
+          "administracion_publica"
+        )
+      }
+    ],
+    nacionalidad: [
+      {
+        fila: "Nacionalidad",
+        tipo: "Extranjera",
+        personas: dataAñoReferencia.cambioAnual.extranjeros,
+        test: getCambio(dataAñoReferencia, null, "extranjeros"),
+        porcentaje: getCambioPct(dataAñoReferencia, null, "extranjeros")
+      },
+      {
+        fila: "Nacionalidad",
+        tipo: "Chilena",
+        personas:
+          dataAñoReferencia.cambioAnual.O -
+          dataAñoReferencia.cambioAnual.extranjeros,
+        test: getCambio(dataAñoReferencia, "O", "extranjeros"),
+        porcentaje: getCambioPct(dataAñoReferencia, "O", "extranjeros")
+      }
+    ],
+    sexo: [
+      {
+        fila: "Sexo",
+        tipo: "Hombres",
+        personas: dataAñoReferencia.cambioAnual.hombres,
+        test: getCambio(dataAñoReferencia, null, "hombres"),
+        porcentaje: getCambioPct(dataAñoReferencia, null, "hombres")
+      },
+      {
+        fila: "Sexo",
+        tipo: "Mujeres",
+        personas: dataAñoReferencia.cambioAnual.mujeres,
+        test: getCambio(dataAñoReferencia, null, "mujeres"),
+        porcentaje: getCambioPct(dataAñoReferencia, null, "mujeres")
+      }
+    ]
+  };
+
+  return Plot.plot({
+    title: `Cambio en ocupación - ${añoReferencia} vs ${
+      añoReferencia - 1
+    } Trimestre ${etiquetasTrimestres[mes]}`,
+
+    width,
+    height: 300,
+    marginLeft: 100,
+    marginRight: 0,
+    x: { tickFormat: "s", domain: [0, maxValue] },
+    y: {
+      tickFormat: (d) => d,
+      domain: [
+        "Ocupados",
+        "Formalidad",
+        "Categoria",
+        "Actividad",
+        "Nacionalidad",
+        "Sexo"
+      ],
+      label: ""
+    },
+    marks: [
+      _.chain(dataSets)
+        .map((set, key) => [
+          Plot.barX(set, {
+            x: "personas",
+            y: "fila",
+            fill: "tipo"
+          }),
+          Plot.text(
+            set,
+            Plot.stackX({
+              x: "personas",
+              y: "fila",
+              z: "tipo",
+              fill: "#EEE",
+              fontWeight: "bold",
+              text: (d) => buildLabel(d),
+
+              text_: (d) =>
+                `${d["tipo"]}\n${d["personas"] > 0 ? "+" : ""}${d3.format(
+                  ".3s"
+                )(d["personas"])}` +
+                ` (${d["personas"] > 0 ? "+" : ""}${d3.format(".1%")(
+                  d["porcentaje"]
+                )})`
+            })
+          )
+        ])
+        .value()
+    ]
+  });
 }
 ```
 
 
+```js
+const etiquetasTrimestres = {
+  1: "Diciembre-Febrero",
+  2: "Enero-Marzo",
+  3: "Febrero-Abril",
+  4: "Marzo-Mayo",
+  5: "Abril-Junio",
+  6: "Mayo-Julio",
+  7: "Junio-Agosto",
+  8: "Julio-Septimbre",
+  9: "Agosto-Octubre",
+  10: "Septiembre-Noviembre",
+  11: "Octubre-Diciembre",
+  12: "Noviembre-Enero"
+}
 
-```sql id=dataDefuncionesChilePorEdad
-SELECT *
-FROM defuncionesChilePorEdad  
-```
+const mes = 4;
 
-```sql id=[statsChile]
-SELECT *
-FROM statsPorComuna 
-WHERE comuna = 'Chile'
-```
+function getCambios() {
 
-```sql id=[statsComuna]
-SELECT *
-FROM statsPorComuna 
-WHERE comuna = ${comuna}
-```
+  const dict = {};
 
-```sql id=statsComunaMasChile
-SELECT *
-FROM statsPorComuna 
-WHERE comuna = ${comuna} OR comuna = 'Chile'
-```
+  const minAño = _.chain(dataTrends)
+    .map((d) => d.año)
+    .min()
+    .value();
 
-```sql id=statsComunas
-SELECT *
-FROM statsPorComuna 
-```
 
-```sql id=statsComunasTop
-SELECT *
-FROM statsPorComuna 
-WHERE p50 > 78 AND n > 1000 or comuna = 'Chile'
-```
 
-```sql id=statsComunasBottom
-SELECT *
-FROM statsPorComuna 
-WHERE p50 < 74 AND n > 1000 or comuna = 'Chile'
-ORDER BY p50 DESC
-```
+  return _.chain(dataTrends)
+    .filter((d) => d.mes == mes)
+    .each((d) => {
+      dict[d.año] = d;
+    })
+    .filter((d) => d.año > minAño)
+    .map((d) => {
+      const record = {
+        año: d.año,
+        mes: d.mes,
+        metrics: [],
+        cambioAnual: {}
+      };
+      _.keys(d)
+        .filter((d) => !d.match(/año|mes/))
+        .forEach((key) => {
+          record.metrics.push(key);
+          record[key] = d[key];
+          record.cambioAnual[key] =
+            d[key] - ((dict[d.año - 1] && dict[d.año - 1][key]) || null);
+        });
 
-```sql id=statsComunasSimilarAChile
-SELECT *
-FROM statsPorComuna 
-WHERE p50 = ${statsChile.p50} AND p25 = ${statsChile.p25} AND p75 = ${statsChile.p75} AND n > 1000 or comuna = 'Chile'
-ORDER BY p50 DESC
-```
+      return record;
+    })
+    .value();
+}
 
-```sql id=dataDefuncionesPorComunaEdad
-SELECT *
-FROM defuncionesPorComunaEdad  
-```
+const dataCambios = getCambios()
 
-```sql id=dataComunas
-SELECT DISTINCT comuna
-FROM statsPorComuna  
-WHERE n >= 1000
-ORDER BY comuna
-```
-
-```sql id=dataDefuncionesPorComuna
-SELECT *
-FROM defuncionesPorComuna  
-ORDER BY defunciones DESC
 ```
 
 ```js
-import {buildDistChart} from "./components/distributionChart.js";
+const dataTrends = [...dataTrends_]
+```
 
+```sql id=dataTrends_
+SELECT *
+FROM ene
+LIMIT 100
+```
+
+```js 
+import moment from 'npm:moment'
 import { es_ES } from "./components/config.js";
 d3.formatDefaultLocale(es_ES);
 ```

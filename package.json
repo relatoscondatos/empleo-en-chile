@@ -6,7 +6,9 @@
     "build": "rimraf dist && observable build",
     "dev": "observable preview",
     "deploy": "observable deploy",
-    "observable": "observable"
+    "observable": "observable",
+    "createEnv":"python3 -m venv .venv",
+    "env":"source .venv/bin/activate"
   },
   "dependencies": {
     "@observablehq/framework": "^1.9.0",
