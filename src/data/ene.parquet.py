@@ -8,12 +8,12 @@ data = pd.read_parquet(file_path)
 data2 = pd.read_parquet(file_path)
 
 # Load the additional lookup tables from TSV files
-actividadEconomica = pd.read_csv("src/data/actividadEconomica.tsv", sep='\t')
-categoriaOcupacion = pd.read_csv("src/data/categoriaOcupacion.tsv", sep='\t')
-grupoOcupacional = pd.read_csv("src/data/grupoOcupacional.tsv", sep='\t')
-formalidadOcupacion = pd.read_csv("src/data/formalidadOcupacion.tsv", sep='\t')
-formalidadSector = pd.read_csv("src/data/formalidadSector.tsv", sep='\t')
-sexo = pd.read_csv("src/data/sexo.tsv", sep='\t')
+actividadEconomica = pd.read_csv("src/data/codigos_actividadEconomica.tsv", sep='\t')
+categoriaOcupacion = pd.read_csv("src/data/codigos_categoriaOcupacion.tsv", sep='\t')
+grupoOcupacional = pd.read_csv("src/data/codigos_grupoOcupacional.tsv", sep='\t')
+formalidadOcupacion = pd.read_csv("src/data/codigos_formalidadOcupacion.tsv", sep='\t')
+formalidadSector = pd.read_csv("src/data/codigos_formalidadSector.tsv", sep='\t')
+sexo = pd.read_csv("src/data/codigos_sexo.tsv", sep='\t')
 
 # Ensure matching column types before merging
 data['b14_rev4cl_caenes'] = data['b14_rev4cl_caenes'].astype(str)
