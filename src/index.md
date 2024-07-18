@@ -2,7 +2,12 @@
 sql:
   ene: data/ene.parquet
 ---
-# Empleo en Chile 2.0
+# Empleo en Chile
+
+<div class="card">
+<h2>Distribución población</h2>
+${ditribucionCifras(2024)}
+</div>
 
  
 <div class="card">
@@ -11,10 +16,6 @@ ${buildChart()}
 </div>
 
  
-<div class="card">
-<h2>Distribución población</h2>
-${ditribucionCifras(2024)}
-</div>
 
 
 <div class="card">
@@ -49,7 +50,7 @@ function buildChart() {
         personas: d.DO,
         topline: d.O + d.DO
       },
-      {
+/*      {
         date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
         año: d.año,
         mes: d.mes,
@@ -64,7 +65,7 @@ function buildChart() {
         tipo: "Menores de 15 años",
         personas: d.personas - d.PET,
         topline: d.personas
-      }
+      }*/
     ])
     .flatten()
     .value();
