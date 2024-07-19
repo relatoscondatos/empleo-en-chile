@@ -47,3 +47,17 @@ export const es_ES = ({
   ]
 })
 
+export const etiquetasTrimestres = {
+  1: "Diciembre-Febrero",
+  2: "Enero-Marzo",
+  3: "Febrero-Abril",
+  4: "Marzo-Mayo",
+  5: "Abril-Junio",
+  6: "Mayo-Julio",
+  7: "Junio-Agosto",
+  8: "Julio-Septimbre",
+  9: "Agosto-Octubre",
+  10: "Septiembre-Noviembre",
+  11: "Octubre-Diciembre",
+  12: "Noviembre-Enero"
+}
