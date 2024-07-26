@@ -1,0 +1,36 @@
+import pandas as pd
+import io
+import sys
+
+# Load the first parquet file
+emp_file_path = "src/data/EMP_NIFL_SEX_RT_A-20240726T0000.parquet"
+emp_df = pd.read_parquet(emp_file_path)
+
+# Filter the first DataFrame
+filtered_emp_df = emp_df[(emp_df['sex'] == 'Total')]
+
+
+# Sort the DataFrame by 'country' and 'time' in descending order
+sorted_emp_df = filtered_emp_df.sort_values(by=['country', 'time'], ascending=[True, False])
+
+# Get the latest record for each country
+latest_emp_records_df = sorted_emp_df.drop_duplicates(subset=['country'], keep='first')
+
+# Load the second parquet file
+gdp_file_path = "src/data/mpd2023_full_data.parquet"
+gdp_df = pd.read_parquet(gdp_file_path)
+
+# Filter the second DataFrame for the year 2022
+gdp_2022_df = gdp_df[gdp_df['year'] == 2022][['countrycode', 'region', 'gdppc']].rename(columns={'countrycode': 'countryCode', 'gdppc': 'gdppc2022'})
+
+# Merge the DataFrames on the 'countryCode' column
+merged_df = latest_emp_records_df.merge(gdp_2022_df, on='countryCode', how='left')
+
+# Create an in-memory buffer
+buffer = io.BytesIO()
+
+# Convert the merged DataFrame to a Parquet file in memory
+merged_df.to_parquet(buffer, engine='pyarrow')
+
+# Write the buffer content to sys.stdout
+sys.stdout.buffer.write(buffer.getvalue())
