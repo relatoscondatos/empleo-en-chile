@@ -12,8 +12,8 @@ filtered_emp_df = emp_df[(emp_df['sex'] == 'Total')]
 # Pivot the DataFrame to get 'sector' values as columns
 pivoted_emp_df = filtered_emp_df.pivot_table(index=['country', 'countryCode', 'time'], columns='sector', values='value').reset_index()
 
-# Calculate the publicPercentage
-pivoted_emp_df['publicPercentage'] = pivoted_emp_df['Public'] / pivoted_emp_df['Total']
+# Handle division by zero and NaN values
+pivoted_emp_df['publicPercentage'] = pivoted_emp_df['Public'] / pivoted_emp_df['Total'].replace(0, pd.NA)
 
 # Sort the DataFrame by 'country' and 'time' in descending order
 sorted_emp_df = pivoted_emp_df.sort_values(by=['country', 'time'], ascending=[True, False])
@@ -22,14 +22,14 @@ sorted_emp_df = pivoted_emp_df.sort_values(by=['country', 'time'], ascending=[Tr
 latest_emp_records_df = sorted_emp_df.drop_duplicates(subset=['country'], keep='first')
 
 # Load the second parquet file
-gdp_file_path = "src/data/mpd2023_full_data.parquet"
+gdp_file_path = "src/data/gdp_per_capita_ppp_current_international$.parquet"
 gdp_df = pd.read_parquet(gdp_file_path)
 
-# Filter the second DataFrame for the year 2022
-gdp_2022_df = gdp_df[gdp_df['year'] == 2022][['countrycode', 'region', 'gdppc']].rename(columns={'countrycode': 'countryCode', 'gdppc': 'gdppc2022'})
+# Filter the second DataFrame for the year 2023
+gdp_2023_df = gdp_df[gdp_df['year'] == 2023][['countryCode', 'region', 'incomeGroup', 'value']].rename(columns={'value': 'gdppc'})
 
 # Merge the DataFrames on the 'countryCode' column
-merged_df = latest_emp_records_df.merge(gdp_2022_df, on='countryCode', how='left')
+merged_df = latest_emp_records_df.merge(gdp_2023_df, on='countryCode', how='left')
 
 # Create an in-memory buffer
 buffer = io.BytesIO()

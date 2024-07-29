@@ -48,16 +48,16 @@ export const es_ES = ({
 })
 
 export const etiquetasTrimestres = {
-  1: "Diciembre-Febrero",
-  2: "Enero-Marzo",
-  3: "Febrero-Abril",
-  4: "Marzo-Mayo",
-  5: "Abril-Junio",
-  6: "Mayo-Julio",
-  7: "Junio-Agosto",
-  8: "Julio-Septimbre",
-  9: "Agosto-Octubre",
-  10: "Septiembre-Noviembre",
-  11: "Octubre-Diciembre",
-  12: "Noviembre-Enero"
+  1: "Diciembre-Enero-Febrero",
+  2: "Enero-Febrero-Marzo",
+  3: "Febrero-Marzo-Abril",
+  4: "Marzo-Abril-Mayo",
+  5: "Abril-Mayo-Junio",
+  6: "Mayo-Junio-Julio",
+  7: "Junio-Julio-Agosto",
+  8: "Julio-Agosto-Septimbre",
+  9: "Agosto-Septiembre-Octubre",
+  10: "Septiembre-Octubre-Noviembre",
+  11: "Octubre-Noviembre-Diciembre",
+  12: "Noviembre-Diciembre-Enero"
 }
