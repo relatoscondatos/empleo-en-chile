@@ -39,22 +39,10 @@ const registroReferencia = datosEmpleo.find(d => d.año == añoReferencia && d.m
 ## Datos para trimestre móvil ${etiquetaMesReferencia} de ${añoReferencia}
 
 
-## ¿Fuerza de trabajo?
+## Clasificación de la población
 Cuando se dan los datos de empleo se mencionan a las personas ocupadas y las desocupadas, pero esta no es toda la población en Chile.
 
-Del total de la poblacion en Chile (${d3.format(".3s")(registroReferencia.personas)}), las **Personas en Edad de Trabajar** son aquellas con 15 años o más (${d3.format(".3s")(registroReferencia.PET)}), pero no todas ellas buscan empleo.  Aquellas que lo hacen son la **Fuerza de Trabajo** (${d3.format(".3s")(registroReferencia.FT)})  
-
-En la Fuerza de Trabajo en Chile en el trimestre ${etiquetaMesReferencia} de ${añoReferencia} habían:
-
-* ${d3.format(".3s")(registroReferencia.O)} de **personas ocupadas**
-* ${d3.format(".3s")(registroReferencia.DO)} de **personas desocupadas**
-
-Las personas desocupadas representan un ${d3.format(".1%")(registroReferencia.DO/registroReferencia.FT)} de la Fuerza de Trabajo.
-
-
-Durante el trimestre Marzo-Abril-Mayo (MAM) de 2024, se reportó que había 9,3 millones de personas ocupadas en Chile y 846 mil desocupadas.
-
-Las personas ocupadas más las desocupadas componen la Fuerza de Trabajo, que son 10,2 millones de personas. Los desocupados representan el 8,3% de esta Fuerza de Trabajo.
+En Chile en el trimestre Marzo-Abril-Mayo de 2024 había una población total de (${d3.format(".3s")(registroReferencia.personas)}), las **Personas en Edad de Trabajar** son aquellas con 15 años o más (${d3.format(".3s")(registroReferencia.PET)})
 
 <div class="card">
 <h2>Distribución población</h2>
@@ -62,7 +50,9 @@ Las personas ocupadas más las desocupadas componen la Fuerza de Trabajo, que so
 <div>${distribucionCifras2({data:datosEmpleo,añoReferencia:añoReferencia,mesReferencia:mesReferencia, width:640, stage:1})}</div>
 </div><!--card-->
 
-Ahora, hablemos sobre las personas en edad de trabajar, que son aquellas de 15 años o más. En Chile, hay 16,4 millones de personas en este grupo, pero no todas forman parte de la Fuerza de Trabajo. Más de 6 millones de personas son “inactivas”, como estudiantes, jubilados o personas que no desean trabajar.
+
+Dentro de las Personas en Edad de Trabajar existe un grupo que se clasifica como **Personas Inactivas**.  Estas son, por ejemplo, aquellas personas jubiladas, estudiantes o quienes no desean tranajar.  El resto son lo que llamamod la **Fuerza de Trabajo** y son (${d3.format(".3s")(registroReferencia.FT)})  personas.
+
 
 <div class="card">
 <h2>Distribución población</h2>
@@ -70,7 +60,12 @@ Ahora, hablemos sobre las personas en edad de trabajar, que son aquellas de 15 a
 <div>${distribucionCifras2({data:datosEmpleo,añoReferencia:añoReferencia,mesReferencia:mesReferencia, width:640, stage:2})}</div>
 </div><!--card-->
 
-Si añadimos los 3,7 millones de menores de 15 años, llegamos a la población total de Chile: sobre 20 millones de personas.
+En la Fuerza de Trabajo en Chile en el trimestre ${etiquetaMesReferencia} de ${añoReferencia} habían:
+
+* ${d3.format(".3s")(registroReferencia.O)} de **personas ocupadas**
+* ${d3.format(".3s")(registroReferencia.DO)} de **personas desocupadas**
+
+Las personas desocupadas representan un ${d3.format(".1%")(registroReferencia.DO/registroReferencia.FT)} de la Fuerza de Trabajo.
 
 <div class="card">
 <h2>Distribución población</h2>
@@ -800,28 +795,35 @@ function distribucionCifras2({data=[], añoReferencia=2024, mesReferencia=1, wid
   const fontColor = "#111"
 
   const data_all =  [
-          { tipo: "Ocupados", personas: dataAñoReferencia.O, level: 1},
-          { tipo: "Desocupados", personas: dataAñoReferencia.DO, level: 1 },
-          { tipo: "Fuerza de Trabajo", personas: dataAñoReferencia.FT, level:2 },
+          { tipo: "Ocupados", personas: dataAñoReferencia.O, level: 4},
+          { tipo: "Desocupados", personas: dataAñoReferencia.DO, level: 4 },
+          { tipo: "Fuerza de Trabajo", personas: dataAñoReferencia.FT, level:3 },
           {
             tipo: "Inactivas",
             personas: dataAñoReferencia.PET - dataAñoReferencia.FT,
-            level:2
+            level:3
           },
           {
             tipo: "En Edad de Trabajar",
             personas: dataAñoReferencia.PET,
-            level:3
+            level:2
           },
           {
             tipo: "Menores de 15 años",
             personas: dataAñoReferencia.personas - dataAñoReferencia.PET,
-            level:3
+            level:2
           },
-          { tipo: "Población Total", personas: dataAñoReferencia.personas , level:4}
+          { tipo: "Población Total", personas: dataAñoReferencia.personas , level:1}
         ]
 
   const dataGroups = {
+   1: data_all.filter(d => d.tipo.match(/En Edad de Trabajar|Menores de 15 años|Población Tota/)),
+   2: data_all.filter(d => d.tipo.match(/Fuerza de Trabajo|Inactivas|En Edad de Trabajar/)),
+   3: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo/))
+
+  }
+
+   const dataGroups_ = {
    1: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo/)),
    2: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo|Inactivas|En Edad de Trabajar/)),
   3: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo|Inactivas|En Edad de Trabajar|Menores de 15 años|Población Total/))
