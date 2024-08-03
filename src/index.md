@@ -6,6 +6,7 @@ sql:
   ilo_ocupacion_informal: data/ilo_ocupacion_informal.parquet
   mpd: data/mpd2023_full_data.parquet
   ilo_sex_gpdpc: data/ilo_sex_gdppc.parquet
+  ene_sintetica: data/ene_sintetica.parquet
 ---
 
 
@@ -25,7 +26,7 @@ const añoReferencia = 2024
 // Get unique months for the selected reference year and create a dropdown for selecting the reference month
 const options_meses = _.chain(datosEmpleo).filter(d => d.año == añoReferencia).map(d => d.mes).uniq().value()
 //const mesReferencia = view(Inputs.select(options_meses, {value: 1, label: "Mes Referencia"}));
-const mesReferencia = 4
+const mesReferencia = 5
 ```
 
 ```js
@@ -33,51 +34,105 @@ const mesReferencia = 4
 const etiquetaMesReferencia = etiquetasTrimestres[mesReferencia];
 
 const registroReferencia = datosEmpleo.find(d => d.año == añoReferencia && d.mes == mesReferencia)
+const registroReferenciaPrevio = datosEmpleo.find(d => d.año == añoReferencia-1 && d.mes == mesReferencia)
+const registro2017 = datosEmpleo.find(d => d.año == 2017 && d.mes == mesReferencia)
+const registro2019 = datosEmpleo.find(d => d.año == 2019 && d.mes == mesReferencia)
+const registro2020 = datosEmpleo.find(d => d.año == 2020 && d.mes == mesReferencia)
+const registro2021 = datosEmpleo.find(d => d.año == 2021 && d.mes == mesReferencia)
 ```
 
 # Empleo en Chile
 ## Datos para trimestre móvil ${etiquetaMesReferencia} de ${añoReferencia}
 
 
+
 ## Clasificación de la población
-Cuando se dan los datos de empleo se mencionan a las personas ocupadas y las desocupadas, pero esta no es toda la población en Chile.
 
-En Chile en el trimestre Marzo-Abril-Mayo de 2024 había una población total de (${d3.format(".3s")(registroReferencia.personas)}), las **Personas en Edad de Trabajar** son aquellas con 15 años o más (${d3.format(".3s")(registroReferencia.PET)})
+```js
+const data2023 = FileAttachment("data/resumen2023.json").json();
+``` 
+
+Al reportar cifras de empleo se habla de conceptos tales como la **Fuerza de trabajo**. A continuación hablaremos de estos conceptos utilizando como ejemplo los datos de empleo en Chile en 2023. 
 
 <div class="card">
 <h2>Distribución población</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${distribucionCifras2({data:datosEmpleo,añoReferencia:añoReferencia,mesReferencia:mesReferencia, width:640, stage:1})}</div>
+<h3>Año 2023</h3>
+<div>${distribucionCifras3({data:data2023, width:640, stage:0})}</div>
+</div><!--card-->
+
+El 2023 en Chile había una población total de (${d3.format(".3s")(data2023.TOTAL)}), pero se considera a quienes tienen 15 años o más como **Personas en Edad de Trabajar**.  En 2023 en Chile eran (${d3.format(".3s")(data2023.PET)}), un ${d3.format(".1%")(data2023.PET/data2023.TOTAL)} de la población total.
+
+
+<div class="card">
+<h2>Distribución población</h2>
+<h3>Año 2023</h3>
+<div>${distribucionCifras3({data:data2023, width:640, stage:1})}</div>
+
 </div><!--card-->
 
 
-Dentro de las Personas en Edad de Trabajar existe un grupo que se clasifica como **Personas Inactivas**.  Estas son, por ejemplo, aquellas personas jubiladas, estudiantes o quienes no desean tranajar.  El resto son lo que llamamod la **Fuerza de Trabajo** y son (${d3.format(".3s")(registroReferencia.FT)})  personas.
+En las Personas en Edad de Trabajar existe un grupo que se clasifica como **Personas Inactivas**.  
 
+Son personas que que no están buscando trabajo, como estudiantes, jubilados, o personas dedicadas a labores del hogar de forma exclusiva. En 2023 en Chile eran ${d3.format(".3s")(data2023.PET- data2023.FT)} personas.
+
+El resto, la **Fuerza de Trabajo**, incluye a todas las personas en edad y capacidad de trabajar que están disponibles para trabajar, es decir, las que están empleadas o en busca de empleo. En 2023 en Chile eran ${d3.format(".3s")(data2023.FT)}, un ${d3.format(".1%")(data2023.FT/data2023.PET)} de las Personas en Edad de Trabajar.
 
 <div class="card">
 <h2>Distribución población</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${distribucionCifras2({data:datosEmpleo,añoReferencia:añoReferencia,mesReferencia:mesReferencia, width:640, stage:2})}</div>
+<h3>Año 2023</h3>
+<div>${distribucionCifras3({data:data2023, width:640, stage:2})}</div>
 </div><!--card-->
 
-En la Fuerza de Trabajo en Chile en el trimestre ${etiquetaMesReferencia} de ${añoReferencia} habían:
 
-* ${d3.format(".3s")(registroReferencia.O)} de **personas ocupadas**
-* ${d3.format(".3s")(registroReferencia.DO)} de **personas desocupadas**
+En la Fuerza de Trabajo hay **personas ocupadas** y **personas desocupadas**.
 
-Las personas desocupadas representan un ${d3.format(".1%")(registroReferencia.DO/registroReferencia.FT)} de la Fuerza de Trabajo.
+Las **personas ocupadas** son aquellas que están trabajando y en 2023 en Chile eran **${d3.format(".3s")(data2023.O)}**, un **${d3.format(".1%")(data2023.O/data2023.PET)} de las personas en edad de trabajar**.  Esta es la cifra que se reporta como **tasa de ocupación**.
+
+Las **personas desocupadas** son aquellas que no están trabajando pero están disponibles y buscando empleo activamente. En 2023 en Chile eran **${d3.format(".3s")(data2023.DO)}**, un **${d3.format(".1%")(data2023.DO/data2023.FT)} de las fuerza de trabajo**. Esta es la cifra que se reporta como **tasa de desocupación**.
 
 <div class="card">
 <h2>Distribución población</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${distribucionCifras2({data:datosEmpleo,añoReferencia:añoReferencia,mesReferencia:mesReferencia, width:640, stage:3})}</div>
+<h3>Año 2023</h3>
+<div>${distribucionCifras3({data:data2023, width:640, stage:3})}</div>
 </div><!--card-->
 
 ## Evolución en el tiempo
 
-Estas cifras evolucionan con el tiempo. Después de una fuerte baja en la ocupación durante la pandemia, las cifras se han ido recuperando. Ya en ${etiquetasTrimestres[mesReferencia]} de 2023, había más personas ocupadas que en el mismo trimestre de 2019.  
+Las cifras de empleo evolucionan con el tiempo. La población total crece, pero los distintos grupos varian sus tamaños absolutos y relativos. El siguiente gráfico muestra cifras para el trimestre ${etiquetasTrimestres[mesReferencia]} entre 2017 y ${añoReferencia}.
 
-En ${añoReferencia} había **${d3.format(".3s")(registroReferencia.O_diff)} ${registroReferencia.O_diff >= 0 ? "más" : "menos"} personas ocupadas** que en ${añoReferencia-1} y **${d3.format(".3s")(registroReferencia.DO_diff)} ${registroReferencia.O_diff >= 0 ? "más" : "menos"} personas desocupadas** que en ${añoReferencia-1}
+La pandemia en 2020 generó una importante reducción en las personas ocupadas. La tasa de ocupación en el trimestre ${etiquetasTrimestres[mesReferencia]} llegó a un **${d3.format(".1%")(registro2020.O / registro2020.PET)} en 2020** vs un **${d3.format(".1%")(registro2019.O / registro2019.PET) } en 2019**.
+
+El empleo ha aumentado progresivamente desde la pandemia, llegando  a una tasa de ocupación de un **${d3.format(".1%")(registroReferencia.O / registroReferencia.PET) } en ${añoReferencia}**
+
+
+```js
+const statsCambio = (function() {
+  const ocupadosActuales = registroReferencia.O
+  const ocupadosPrevios = registroReferencia.O - registroReferencia.O_diff
+
+  const desocupadosActuales = registroReferencia.DO
+  const desocupadosPrevios = registroReferencia.DO - registroReferencia.DO_diff
+
+  const ftActual = registroReferencia.FT
+  const ftPrevia = registroReferencia.FT - registroReferencia.FT_diff
+
+  const desocupacionActual = desocupadosActuales / ftActual
+  const desocupacionPrevia = desocupadosPrevios / ftPrevia
+
+  const aumentoOcupados = ocupadosActuales/ocupadosPrevios -1
+  const aumentoDesocupados = desocupadosActuales/desocupadosPrevios -1
+  const aumentoFT = ftActual/ftPrevia -1
+
+  return {
+    aumentoOcupados: aumentoOcupados,
+    aumentoDesocupados:aumentoDesocupados,
+    aumentoFT:aumentoFT,
+    desocupacionActual:desocupacionActual,
+    desocupacionPrevia:desocupacionPrevia
+  }
+})()
+
+```
 
 
 <div class="card">
@@ -86,83 +141,258 @@ En ${añoReferencia} había **${d3.format(".3s")(registroReferencia.O_diff)} ${r
 <div>${buildChart_evolucionPorMes_bars({data:datosEmpleo, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
 
+
 ## Composición de las personas ocupadas
 
-Veamos como se compone el grupo de **personas ocupadas**.  
+El total de **personas ocupadas** varía en el tiempo. Para el trimestre ${etiquetasTrimestres[mesReferencia]} antes de la pandemia, **en 2019, había ${d3.format(".3s")(registro2019.O)}** de personas ocupadas y en **${añoReferencia} se reportan ${d3.format(".3s")(registroReferencia.O)}**. 
 
-De los ${d3.format(".3s")(registroReferencia.O)}, ${d3.format(".3s")(registroReferencia.ocupacion_informal)} son **ocupaciones informales** (${d3.format(".1%")(registroReferencia.ocupacion_informal / registroReferencia.O)})
+A continuación veremos cómo se descompone ese total de ocupados en distintos sub grupos utilizando como referencia los datos del trimestre ${etiquetasTrimestres[mesReferencia]} en los respectivos años.
 
+<div class="card">
+<h2>Evolución de cifras</h2>
+<h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
+<div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionOcupados, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
+</div><!--card-->
+
+Dentro del total de ocupados, el grupo que corresponde a **ocupación informal** son quienes carecen de protección social y laboral adecuada.
+
+La proporción de ocupación informal **en 2019 era un ${d3.format(".1%")(registro2019.ocupacion_informal / registro2019.O)}**.  
+
+Esta proporción disminuyó en la pandemia bajando a un **${d3.format(".1%")(registro2020.ocupacion_informal / registro2020.O)} en 2020** ya que muchos trabajadores informales pasaron a ser inactivos.  
+
+La cifra ha ido aumentando progresivamente llegando a un **${d3.format(".1%")(registroReferencia.ocupacion_informal / registroReferencia.O)} en ${añoReferencia}**
+
+<div class="card">
+<h2>Evolución de cifras</h2>
+<h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
+<div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionInformalidad, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
+</div><!--card-->
+
+Las personas ocupadas se pueden clasificar en distintas categorías dentro de las cuales están los **asalariados del sector público** que son aquellos trabajadores que están empleados por el gobierno o por entidades estatales.
+
+La proporcíón de asalariados del sector público aumentó de un **${d3.format(".1%")(registro2019.asalariados_sector_publico / registro2019.O)} en 2019** a un **${d3.format(".1%")(registro2020.asalariados_sector_publico / registro2020.O)} en 2020** ya que la cantidad absoluta de ocupados en este sector no fue mayormente afectada por la pandemia. 
+
+Entre **${añoReferencia-1} y ${añoReferencia}** se observa una variacion de **${d3.format(".1%")(registroReferenciaPrevio.asalariados_sector_publico / registroReferenciaPrevio.O)}** a un **${d3.format(".1%")(registroReferencia.asalariados_sector_publico / registroReferencia.O)}**. 
+
+Cabe hacer notar que en 2024 se desarrolló el CENSO Nacional y las cifras de empleo en el sector público pueden verse transitoriamente afectadas por empleos temporales en esta actividad.
 
 
 <div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"formalidad"})}</div>
+<h2>Evolución de cifras</h2>
+<h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
+<div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionSectorPublico, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
 
-${d3.format(".3s")(registroReferencia.asalariados_sector_publico)} son **asalariados del sector público** (${d3.format(".1%")(registroReferencia.asalariados_sector_publico / registroReferencia.O)})
+Las cifras de empleo también se ven afectadas por cambios en la **población extranjera** en Chile.
+
+La proporción de personas extranjeras entre los ocupados aumento de manera importante de un **${d3.format(".1%")(registro2017.extranjeros / registro2017.O)} en 2017** a un **${d3.format(".1%")(registro2021.extranjeros / registro2021.O)} en 2021**.
+
+A partir de 2021 la proporción de extranjeros muestra cierta estabilidad, llegando a un **${d3.format(".1%")(registroReferencia.extranjeros / registroReferencia.O)} en ${añoReferencia}**
 
 <div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"categoria"})}</div>
+<h2>Evolución de cifras</h2>
+<h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
+<div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionExtranjeros, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
 
-${d3.format(".3s")(registroReferencia.extranjeros)} son **extranjeros** (${d3.format(".1%")(registroReferencia.extranjeros / registroReferencia.O)})
+La mayoría de las personas ocupadas son hombres.
+
+La **proporción de mujeres** en el empleo disminuyó en la pandemia a un **${d3.format(".1%")(registro2020.mujeres / registro2020.O)} en 2020** y ha aumentado desde esa fecha. Pero la cifra en **${añoReferencia} (${d3.format(".1%")(registroReferencia.mujeres / registroReferencia.O)})** no es muy superior a la que se observaba en **2019 (${d3.format(".1%")(registro2019.mujeres / registro2019.O)})**
+
 
 <div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"nacionalidad"})}</div>
+<h2>Evolución de cifras</h2>
+<h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
+<div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionSexo, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
 
-${d3.format(".3s")(registroReferencia.mujeres)} son **mujeres** (${d3.format(".1%")(registroReferencia.mujeres / registroReferencia.O)})
-
-<div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"sexo"})}</div>
-</div><!--card-->
-
-
-## Composición del cambio en personas ocupadas
-
-
-Como ya mencionamos, con respecto al año previo hubo **${registroReferencia.O_diff >= 0 ? "un aumento" : "una disminución"} de ${d3.format(".3s")(registroReferencia.O_diff)} personas ocupadas**. Veamos como se compone esta cifra.  
-
-De estas ${d3.format(".3s")(registroReferencia.O_diff)} personas, ${d3.format(".3s")(registroReferencia.ocupacion_informal_diff)} son **ocupaciones informales**
-
-<div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionCambioOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"formalidad"})}</div>
-</div><!--card-->
-
-${d3.format(".3s")(registroReferencia.asalariados_sector_publico_diff)} son **asalariados del sector público**
-
-<div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionCambioOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"categoria"})}</div>
-</div><!--card-->
-
-${d3.format(".3s")(registroReferencia.extranjeros_diff)} son **extranjeros**
-
-<div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionCambioOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"nacionalidad"})}</div>
-</div><!--card-->
-
-${d3.format(".3s")(registroReferencia.mujeres_diff)} son **mujeres** 
-<div class="card">
-<h2>Distribución personas Ocupadas</h2>
-<h3>${añoReferencia} - Trimestre ${etiquetasTrimestres[mesReferencia]}</h3>
-<div>${ditribucionCambioOcupadosVert({data:datosEmpleo, añoReferencia:añoReferencia,mesReferencia: mesReferencia, foco:"sexo"})}</div>
-</div><!--card-->
 
 
 ## ¿Cómo son las cifras de Chile al comparar con otros países?
+## Porcentaje de empleo informal
+
+```js
+
+(function() {
+  const dataPlot = _.chain([...dataPaises_ocupacion_informal])
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.value/100
+    }
+
+    return record
+  })
+  .filter(d => d.countryCode && d.country.match(/Chile|UK|Brazil|Argentina|Haiti|Russia|Peru|Nicaragua|Barbados/))
+  .value()
+
+  return beeSwarm({data:dataPlot, r:25, showLabel:true, showXAxis:false, height:150})
+})()
+```
+
+```js
+
+(function() {
+  const dataPlot = _.chain([...dataPaises_ocupacion_informal])
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.value/100
+    }
+    return record
+  })
+  .filter(d => d.countryCode)
+  .value()
+
+  return beeSwarm({data:dataPlot, r:7})
+})()
+```
+
+```js
+
+(function() {
+  const dataPlot = _.chain([...dataPaises_ocupacion_informal])
+  .filter(d => d.countryCode && d.incomeGroup == "High income" )
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.value/100
+    }
+    return record
+  })
+  .filter(d => d.countryCode)
+  .value()
+
+  return beeSwarm({data:dataPlot, r:10, height:600})
+})()
+```
+
+
+
+## Porcentaje de empleo público 
+
+```js
+(function() {
+  const dataPlot = _.chain([...dataPaises_sector])
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.publicPercentage
+    }
+    return record
+  })
+  .filter(d => d.countryCode && d.country.match(/Chile|Djibouti|Cuba|Seychelles|Tuvalu|Norway|UK|Uganda/))
+  .value()
+
+
+  return beeSwarm({data:dataPlot, r:25, showLabel:true, showXAxis:false, height:150})
+})()
+```
+
+```js
+
+(function() {
+  const dataPlot = _.chain([...dataPaises_sector])
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.publicPercentage
+    }
+    return record
+  })
+  .filter(d => d.countryCode)
+  .value()
+
+  return beeSwarm({data:dataPlot, r:7})
+})()
+```
+
+```js
+
+(function() {
+  const dataPlot = _.chain([...dataPaises_sector])
+  .filter(d => d.countryCode && d.incomeGroup == "High income" )
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.publicPercentage
+    }
+    return record
+  })
+  .filter(d => d.countryCode)
+  .value()
+
+  return beeSwarm({data:dataPlot, r:14})
+})()
+```
+
+
+
+
+## Porcentaje de empleo femenino
+
+```js
+(function() {
+  const dataPlot = _.chain([...dataPaises_sexo])
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.femalePercentage
+    }
+    return record
+  })
+  .filter(d => d.countryCode && d.country.match(/Chile|Yemen|Iraq|Qatar|Morocco|India|Somalia|Costa Rica|Canada|Mozambique/))
+  .value()
+
+
+  return beeSwarm({data:dataPlot, r:25, showLabel:true, showXAxis:false, xScale:[0.05,0.55], height:150})
+})()
+```
+
+```js
+(function() {
+  const dataPlot = _.chain([...dataPaises_sexo])
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.femalePercentage
+    }
+    return record
+  })
+  .value()
+
+
+  return beeSwarm({data:dataPlot, r:7,xScale:[0.05,0.55], height:500})
+})()
+```
+
+
+```js
+(function() {
+  const dataPlot = _.chain([...dataPaises_sexo])
+  .filter(d => d.countryCode && d.incomeGroup == "High income" )
+  .map(d => {
+    const record = {
+      country:d.country,
+      countryCode:d.countryCode,
+      value:d.femalePercentage
+    }
+    return record
+  })
+  .value()
+
+  return beeSwarm({data:dataPlot, r:10,xScale:[0.05,0.55]})
+})()
+```
+
 
 ```js
 const grupoPaisesView = Inputs.select(["Alto ingreso", "América Latina y el Caribe"], { label: "Grupo de paises"});
@@ -887,6 +1117,123 @@ function distribucionCifras2({data=[], añoReferencia=2024, mesReferencia=1, wid
 
 ```
 
+```js
+/**
+ * Processes data with the given options and builds a bar chart showing the distribution of the population.
+ * 
+ * @param {Object} options - The options for processing data.
+ * @param {Array} options.data - The employment data.
+ * @param {number} [options.añoReferencia=2024] - The reference year.
+ * @param {number} [options.mesReferencia=1] - The reference month.
+ * @param {number} [options.width=640] - The width of the chart.
+ * @returns {Object} - The chart configuration.
+ */
+function distribucionCifras3({data={}, width=640, stage=3} = {}) {
+
+  // Calculate the maximum value for the x-axis domain
+  const maxValue = data.TOTAL
+
+  // Get the data for the reference year and month
+  const dataAñoReferencia = data
+
+  const fontColor = "#111"
+
+  const data_all =  [
+          { tipo: "Ocupados", personas: dataAñoReferencia.O, level: 4},
+          { tipo: "Desocupados", personas: dataAñoReferencia.DO, level: 4 },
+          { tipo: "Fuerza de Trabajo", personas: dataAñoReferencia.FT, level:3 },
+          {
+            tipo: "Inactivas",
+            personas: dataAñoReferencia.PET - dataAñoReferencia.FT,
+            level:3
+          },
+          {
+            tipo: "En Edad de Trabajar",
+            personas: dataAñoReferencia.PET,
+            level:2
+          },
+          {
+            tipo: "Menores de 15 años",
+            personas: dataAñoReferencia.TOTAL - dataAñoReferencia.PET,
+            level:2
+          },
+          { tipo: "Población Total", personas: dataAñoReferencia.TOTAL , level:1}
+        ]
+
+  const dataGroups = {
+    
+   0: data_all.filter(d => d.tipo.match(/En Edad de Trabajar|Menores de 15 años|Población Tota|Fuerza de Trabajo|Inactivas|Ocupados|Desocupados/)),
+   1: data_all.filter(d => d.tipo.match(/En Edad de Trabajar|Menores de 15 años|Población Tota/)),
+   2: data_all.filter(d => d.tipo.match(/Fuerza de Trabajo|Inactivas|En Edad de Trabajar/)),
+   3: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo/))
+
+  }
+
+   const dataGroups_ = {
+   1: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo/)),
+   2: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo|Inactivas|En Edad de Trabajar/)),
+  3: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo|Inactivas|En Edad de Trabajar|Menores de 15 años|Población Total/))
+  }
+
+  const dataPlot = dataGroups[stage]
+
+  // Build the plot configuration
+  return Plot.plot({
+    caption: fuenteINE,
+    width,
+    marginLeft: 40,
+    marginRight: 0,
+    color:{
+      domain: [
+        "Ocupados",
+        "Desocupados",
+        "Fuerza de Trabajo",
+        "Inactivas",
+        "En Edad de Trabajar",
+        "Menores de 15 años",
+        "Población Total"
+      ]
+    },
+    y: { 
+      tickFormat: "s", 
+      //domain: [0, maxValue],       
+      label:"Personas"
+    },
+    x: {
+      tickSize: 0,
+      tickFormat: (d) => "",
+      domain: [
+        1,2,3,4
+      ],
+      label:""
+    },
+    style :{fontSize:12},
+    marks: [
+      Plot.barY(
+        dataPlot,
+        {
+          x: "level",
+          y: "personas",
+          fill: "tipo"
+        }
+      ),
+      Plot.text(
+        dataPlot,
+        Plot.stackY({
+          x: "level",
+          y: "personas",
+          z: "tipo",
+          text:d => `${d.tipo}\n${d3.format(".3s")(d.personas)}`,
+          fill: d => d.tipo.match(/Ocupados/) ? "white" : "black"
+        })
+      )
+    ]
+  });
+}
+
+```
+
+
 
 ```js
 /**
@@ -1146,6 +1493,265 @@ function buildChart_evolucionPorMes_bars({ data = [], añoReferencia = 2024, mes
           x: "date",
           fill: (d) => (d.tipo == "Ocupadas" ? "white" : "black"),
           text: (d) => d3.format(".3s")(d.personas),
+          textAnchor: "middle",
+          dx: -1
+        })
+      ),
+      
+      
+      // Add text labels for the data points of the last month in the reference year
+      Plot.text(
+        dataPlotLast,
+        Plot.stackY({
+          y: "personas",
+          x: "date",
+          fill: (d) => (d.tipo == "Ocupadas" ? "black" : "black"),
+          text: "tipo",
+          textAnchor: "start",
+          dx: 50
+        })
+      )
+      
+    ]
+  });
+}
+
+```
+
+
+```js
+const dataPlotEvolucionOcupados = _.chain(datosEmpleo)
+    .filter(d => d.año == añoReferencia ? d.mes <= mesReferencia : d.año < añoReferencia && d.año > 2017)
+    .map((d) => [
+      {
+        // Create data point for 'Ocupadas' (Employed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Ocupados",
+        personas: d.O,
+        percentage: d.O/d.O,
+        order:1,
+        //topline: d.ocupacion_informal
+      }
+           
+    ])
+    .flatten() // Flatten the array of arrays
+    .sortBy(d => d.mes) // Sort by month
+    .sortBy(d => d.año) // Sort by year
+    .filter(d => d.mes == mesReferencia)
+    .value(); // Extract the value from the chain
+
+const dataPlotEvolucionInformalidad = _.chain(datosEmpleo)
+    .filter(d => d.año == añoReferencia ? d.mes <= mesReferencia : d.año < añoReferencia && d.año > 2017)
+    .map((d) => [
+      {
+        // Create data point for 'Ocupadas' (Employed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Informales",
+        personas: d.ocupacion_informal,
+        percentage: d.ocupacion_informal/d.O,
+        order:1,
+        //topline: d.ocupacion_informal
+      },
+      {
+        // Create data point for 'Desocupadas' (Unemployed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Formales",
+        personas: d.O-d.ocupacion_informal,
+        percentage: 1-d.ocupacion_informal/d.O,
+        order:2,
+        //topline: d.O + d.ocupacion_informal
+      },
+      // Uncomment the following blocks if you need 'Inactivas' and 'Menores de 15 años' categories
+           
+    ])
+    .flatten() // Flatten the array of arrays
+    .sortBy(d => d.mes) // Sort by month
+    .sortBy(d => d.año) // Sort by year
+    .filter(d => d.mes == mesReferencia)
+    .value(); // Extract the value from the chain
+
+const dataPlotEvolucionSectorPublico = _.chain(datosEmpleo)
+    .filter(d => d.año == añoReferencia ? d.mes <= mesReferencia : d.año < añoReferencia)
+    .map((d) => [
+      {
+        // Create data point for 'Ocupadas' (Employed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Sector Público",
+        personas: d.asalariados_sector_publico,
+        percentage: d.asalariados_sector_publico/d.O,
+        order:1,
+
+      },
+      {
+        // Create data point for 'Desocupadas' (Unemployed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Otros",
+        personas: d.O-d.asalariados_sector_publico,
+        percentage: 1-d.asalariados_sector_publico/d.O,
+        order:2,
+        //topline: d.O + d.ocupacion_informal
+      },
+      // Uncomment the following blocks if you need 'Inactivas' and 'Menores de 15 años' categories
+           
+    ])
+    .flatten() // Flatten the array of arrays
+    .sortBy(d => d.mes) // Sort by month
+    .sortBy(d => d.año) // Sort by year
+    .filter(d => d.mes == mesReferencia)
+    .value(); // Extract the value from the chain
+
+const dataPlotEvolucionExtranjeros = _.chain(datosEmpleo)
+    .filter(d => d.año == añoReferencia ? d.mes <= mesReferencia : d.año < añoReferencia)
+    .map((d) => [
+      {
+        // Create data point for 'Ocupadas' (Employed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Extranjeros",
+        personas: d.extranjeros,
+        percentage: d.extranjeros/d.O,
+        order:1,
+
+      },
+      {
+        // Create data point for 'Desocupadas' (Unemployed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Chilenos",
+        personas: d.O-d.extranjeros,
+        percentage: 1-d.extranjeros/d.O,
+        order:2,
+        //topline: d.O + d.ocupacion_informal
+      },
+      // Uncomment the following blocks if you need 'Inactivas' and 'Menores de 15 años' categories
+           
+    ])
+    .flatten() // Flatten the array of arrays
+    .sortBy(d => d.mes) // Sort by month
+    .sortBy(d => d.año) // Sort by year
+    .filter(d => d.mes == mesReferencia)
+    .value(); // Extract the value from the chain
+
+
+const dataPlotEvolucionSexo = _.chain(datosEmpleo)
+    .filter(d => d.año == añoReferencia ? d.mes <= mesReferencia : d.año < añoReferencia)
+    .map((d) => [
+      {
+        // Create data point for 'Ocupadas' (Employed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Hombres",
+        personas: d.hombres,
+        percentage: d.hombres/d.O,
+        order:2,
+
+      },
+      {
+        // Create data point for 'Desocupadas' (Unemployed)
+        date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
+        año: d.año,
+        mes: d.mes,
+        tipo: "Mujeres",
+        personas: d.mujeres,
+        percentage: d.mujeres/d.O,
+        order:1,
+        //topline: d.O + d.ocupacion_informal
+      },
+      // Uncomment the following blocks if you need 'Inactivas' and 'Menores de 15 años' categories
+           
+    ])
+    .flatten() // Flatten the array of arrays
+    .sortBy(d => d.order) // Sort by month
+    .sortBy(d => d.mes) // Sort by month
+    .sortBy(d => d.año) // Sort by year
+    .filter(d => d.mes == mesReferencia)
+    .value(); // Extract the value from the chain
+
+
+/**
+ * Builds a chart to show the evolution of employment data by month.
+ * 
+ * @param {Object} options - The options for building the chart.
+ * @param {Array} options.data - The employment data.
+ * @param {number} [options.añoReferencia=2024] - The reference year.
+ * @param {number} [options.mesReferencia=1] - The reference month.
+ * @returns {Object} - The chart configuration.
+ */
+function buildChart_evolucionPorMes_subgrupos_bars({ dataPlot = [], añoReferencia = 2024, mesReferencia = 1 } = {}) {
+  
+  const labels = _.chain(dataPlot)
+    .uniqBy(d => d.tipo)
+    .sortBy(d => d.order)
+    .reverse()
+    .map(d => d.tipo)
+    .value()
+
+  // Filter data for the last month of the reference year
+  const dataPlotLast = _.chain(dataPlot).filter((d) => d.mes == mesReferencia && d.año == añoReferencia).value();
+
+  // Build the plot configuration
+  return Plot.plot({
+    caption: fuenteINE,
+    // width,
+    marginLeft: 40,
+    marginRight: 130,
+    marginBottom: 40,
+    x: { 
+      tickFormat: d => `${moment(d).format('YYYY')}`,
+      type:"band"
+    },    
+    y: { 
+      grid: true, 
+      tickFormat: ".0s",
+      label:"Personas"
+    },
+    color: {
+      domain: labels
+      /*ange: [
+        d3.schemeTableau10[0],
+        d3.schemeTableau10[1],
+        d3.schemeTableau10[2],
+        "lightgrey"
+      ]*/
+    },
+        style :{fontSize:12},
+
+    marks: [
+      // Add a horizontal line at y=0
+      Plot.ruleY([0]),
+
+      // Create an area plot with stacking for the data
+      Plot.barY(
+        dataPlot,
+        Plot.stackY({
+          y: "personas",
+          x: "date",
+          fill: "tipo"
+        })
+      ),
+      
+
+      // Add text labels for the data points of the reference month
+      Plot.text(
+        dataPlot.filter((d) => d.mes == mesReferencia),
+        Plot.stackY({
+          y: "personas",
+          x: "date",
+          fill: (d) => (d.tipo == labels[0] ? "white" : "black"),
+          text: (d) => `${d3.format(".3s")(d.personas)}\n${d3.format(".1%")(d.percentage)}`,
           textAnchor: "middle",
           dx: -1
         })
@@ -1873,17 +2479,127 @@ function ditribucionCambioOcupadosVert({data=[], añoReferencia=2024, mesReferen
 ```
 
 
+
 ```sql id=cifrasMensuales_
 SELECT *
 FROM ene_cambio_anual
 ```
 
+```sql
+SELECT *
+FROM ilo_ocupacion_informal
+WHERE value < 10
+```
+
+
+```sql id=cifrasInformalidad
+SELECT año, mes, O, ocupacion_informal, ocupacion_informal/O as tasaInformalidad
+FROM ene_cambio_anual
+WHERE mes = 4
+ORDER BY año,mes
+```
+
+```js
+
+Plot.plot({
+    caption: fuenteINE,
+
+    height: 300,
+    marginLeft: 70,
+    marginRight: 100,
+    y: { 
+    },
+    x: {
+    },
+    color:{
+    },
+ 
+    marks: [
+      
+      Plot.lineY(
+        cifrasInformalidad,
+        {
+          x: d => moment(`${d.año}-${d.mes}`, `YYYY-M`).toDate(),
+          y: "ocupacion_informal",
+        })
+
+    ]
+  })
+```
+
+
+```js
+
+```
+
+
+```js
+const country_codes = await FileAttachment("./data/country_codes.csv").csv();
+const countryCodeDict3to2 = {}
+country_codes.forEach((d) => {
+  countryCodeDict3to2[d["alpha-3"]] = d["alpha-2"];
+});
+
+function getFlagImageURL(code3) {
+  return `https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.3.0/flags/1x1/${
+              countryCodeDict3to2[code3] && countryCodeDict3to2[code3].toLowerCase()
+            }.svg`
+}
+
+function beeSwarm({
+    data = [], 
+    r=10,
+    formatter = d3.format(".1%"),
+    showLabel = false,
+    showXAxis = true,
+    xScale=[0,1],
+    height=400
+    } = {}) {
+  return Plot.plot({
+    height: height,
+    x:{
+      tickFormat: d => showXAxis ? formatter(d) : "",
+      tickSize:showXAxis ? 5 : 0,
+      domain:xScale
+    },
+    marks: [
+      Plot.image(
+        data,
+        Plot.dodgeY({
+          x: "value",
+          width: 2 * r, 
+          r: r,
+          src: (d) => getFlagImageURL(d.countryCode),
+          tip: true,
+          channels: { pais: "country", "Porcentaje (%)":"value"}
+        })
+      ),
+      showLabel ? Plot.text(
+        data,
+        Plot.dodgeY({
+          x: "value",
+          width: 2 * r, 
+          r: r,
+          text: d => `${d["country"]}\n${formatter(d["value"])}`,
+          dy:-45,
+          channels: { pais: "country", "Empleo informal (%)":"value"}
+        })
+      ) : []
+    ]
+  })
+}
+```
+
+
 ```js 
 // Import required modules and configurations
 import moment from 'npm:moment'
+
 import { es_ES , etiquetasTrimestres} from "./components/config.js";
 
 // Set the default locale for D3 formatting
 d3.formatDefaultLocale(es_ES);
 
 ```
+
+

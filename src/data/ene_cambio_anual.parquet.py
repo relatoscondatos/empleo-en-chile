@@ -66,9 +66,28 @@ result = data.groupby(['año', 'mes']).agg(
     personas=pd.NamedAgg(column='fact_cal', aggfunc='sum')
 ).reset_index()
 
+# Perform the aggregations
+result2 = data.groupby(['año', 'mes']).agg(
+    asalariados_sector_publico=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[data.loc[x.index, 'categoria'] == 'Asalariado sector público'].sum()),
+    O=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[data.loc[x.index, 'Ocupacion'] == 'Ocupados'].sum()),
+    DO=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[data.loc[x.index, 'Ocupacion'] == 'Desocupados'].sum()),
+    FT=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[(data.loc[x.index, 'Ocupacion'] == 'Desocupados') | (data.loc[x.index, 'Ocupacion'] == 'Ocupados')].sum()),
+    PET=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[data.loc[x.index, 'edad_de_trabajar'] == 1].sum()),
+    sector_informal=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[data.loc[x.index, 'sector'] == 2].sum()),
+    ocupacion_informal=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[data.loc[x.index, 'ocup_form'] == 2].sum()),
+    administracion_publica=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[data.loc[x.index, 'actividad'] == 'O Administración pública y defensa; planes de seguridad social de afiliación obligatoria'].sum()),
+    extranjeros=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[(data.loc[x.index, 'Nacionalidad'] == 'Extranjeros') & (data.loc[x.index, 'Ocupacion'] == 'Ocupados')].sum()),
+    hombres=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[(data.loc[x.index, 'sexo_desc'] == 'Hombre') & (data.loc[x.index, 'Ocupacion'] == 'Ocupados')].sum()),
+    mujeres=pd.NamedAgg(column='fact_cal', aggfunc=lambda x: x[(data.loc[x.index, 'sexo_desc'] == 'Mujer') & (data.loc[x.index, 'Ocupacion'] == 'Ocupados')].sum()),
+    personas=pd.NamedAgg(column='fact_cal', aggfunc='sum')
+).reset_index()
+
 
 # Ensure the data is sorted by year and month
 result = result.sort_values(by=['mes', 'año'])
+
+result2 = result.sort_values(by=['mes', 'año'])
+
 
 # Calculate the year-over-year difference for each field
 fields_to_diff = [
@@ -79,6 +98,8 @@ fields_to_diff = [
 
 for field in fields_to_diff:
     result[f'{field}_diff'] = result.groupby('mes')[field].diff()
+    result2[f'{field}_diff'] = result2.groupby('mes')[field].diff()
+    
 
 
 # Create an in-memory buffer
