@@ -5,9 +5,9 @@ sql:
 
 # Empleo en Chile - Actualización Trimestral (Abril-Mayo-Junio) ${añoReferencia}
 
-Las cifras de empleo evolucionan con el tiempo. La población total crece, pero los distintos grupos varian sus tamaños absolutos y relativos. El siguiente gráfico muestra cifras para el trimestre ${etiquetasTrimestres[mesReferencia]} entre 2017 y ${añoReferencia}.
+Las cifras de empleo evolucionan con el tiempo. La población total crece y los distintos grupos varian sus tamaños absolutos y relativos. El siguiente gráfico muestra cifras para el trimestre ${etiquetasTrimestres[mesReferencia]} entre 2017 y ${añoReferencia}.
 
-Dado que hay variaciones estacionales durante el año, para analizar los cambios comparamos el mismo trimestre de distintos años. 
+Dado que hay variaciones estacionales durante el año, para analizar los cambios comparamos el mismo trimestre año a año. 
 
 <div class="card">
 <h2>Evolución de cifras</h2>
@@ -28,15 +28,20 @@ graficoOcupacion
 
 ## Composición de las personas ocupadas
 
-El total de **personas ocupadas** varía en el tiempo. Para el trimestre ${etiquetasTrimestres[mesReferencia]} de **2019, antes de la pandemia, había ${d3.format(".2s")(registro2019.O)}** de personas ocupadas y en **${añoReferencia} se reportan ${d3.format(".2s")(registroReferencia.O)}**. 
+El total de **personas ocupadas** varía en el tiempo. Para el trimestre ${etiquetasTrimestres[mesReferencia]} de **2019, antes de la pandemia, había ${d3.format(".2s")(registro2019.O)}** de personas ocupadas y en **${añoReferencia} se reportan ${d3.format(".2s")(registroReferencia.O)}**.  
 
-A continuación veremos cómo se descompone ese total de ocupados en distintos sub grupos utilizando como referencia los datos del trimestre ${etiquetasTrimestres[mesReferencia]} en los respectivos años.
+De ${añoReferencia-1} a ${añoReferencia} **la cantidad de personas ocupadas ${registroReferencia.O_diff > 0 ? "aumentó" : "disminuyó"} en ${d3.format(".3s")(registroReferencia.O_diff)}**.
 
 <div class="card">
 <h2>Evolución de cifras</h2>
 <h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
 <div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionOcupados, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
+
+
+A continuación veremos cómo se descompone ese total de ocupados en distintos sub grupos utilizando como referencia los datos del trimestre ${etiquetasTrimestres[mesReferencia]} en los respectivos años.
+
+### Ocupación informal
 
 Dentro del total de ocupados, el grupo que corresponde a **ocupación informal** son quienes carecen de protección social y laboral adecuada.
 
@@ -51,6 +56,8 @@ La cifra ha ido aumentando progresivamente llegando a un **${d3.format(".1%")(re
 <h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
 <div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionInformalidad, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
+
+### Asalariados en el sector público
 
 Las personas ocupadas se pueden clasificar en distintas categorías dentro de las cuales están los **asalariados del sector público** que son aquellos trabajadores que están empleados por el gobierno o por entidades estatales.
 
@@ -67,6 +74,8 @@ Cabe hacer notar que en 2024 se desarrolló el CENSO Nacional y las cifras de em
 <div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionSectorPublico, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
 
+### Ocupados de nacionalidad extranjera
+
 Las cifras de empleo también se ven afectadas por cambios en la **población extranjera** en Chile.
 
 La proporción de personas extranjeras entre los ocupados aumentó de manera importante de un **${d3.format(".1%")(registro2017.extranjeros / registro2017.O)} en 2017** a un **${d3.format(".1%")(registro2021.extranjeros / registro2021.O)} en 2021**.
@@ -78,6 +87,8 @@ A partir de 2021 la proporción de extranjeros no aumenta, llegando a un **${d3.
 <h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
 <div>${buildChart_evolucionPorMes_subgrupos_bars({dataPlot:dataPlotEvolucionExtranjeros, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
+
+### Ocupación femenina
 
 La mayoría de las personas ocupadas son hombres.
 
