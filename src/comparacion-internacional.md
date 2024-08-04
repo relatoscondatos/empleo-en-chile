@@ -225,7 +225,7 @@ Chile se encuentra en una posición intermedia.  Muchos países latinoamericanos
   return beeSwarm({
     data:dataPlot, 
     r:18, 
-    height:300,
+    height:220,
     xScale:[0.03,0.35],
     xLabel:"Proporción de empleo en sector público (%)"
   })
@@ -253,6 +253,7 @@ La siguiente visualización ilustra las cifras de empleo público para todos los
   return beeSwarm({
     data:dataPlot, 
     r:7,
+    height:350,
     xScale:[0.00,0.90],
     xLabel:"Proporción de empleo en sector público (%)"
   })
@@ -348,7 +349,7 @@ Entre los países con cifras más bajas está Costa Rica y Honduras, y por la pa
   return beeSwarm({
     data:dataPlot, 
     r:18, 
-    height:300,
+    height:250,
     xScale:[0.36,0.51],
     xLabel:"Proporción de empleo femenino (%)"
   })

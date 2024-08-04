@@ -148,7 +148,6 @@ function distribucionCifras3({data={}, width=640, stage=3} = {}) {
     },
     y: { 
       tickFormat: "s", 
-      //domain: [0, maxValue],       
       label:"Personas"
     },
     x: {
@@ -176,8 +175,7 @@ function distribucionCifras3({data={}, width=640, stage=3} = {}) {
           y: "personas",
           z: "tipo",
           text:d => `${d.tipo}\n${d3.format(".3s")(d.personas)}`,
-          //fill: d => d.tipo.match(/Ocupados/) ? "white" : "black"
-          fill: d => textColor(d.tipo)
+          fill: d => textColor(d.tipo),
         })
       )
     ]
