@@ -5,7 +5,7 @@ sql:
 # Empleo - Conceptos clave 
 
 
-Al reportar cifras de empleo se habla de conceptos tales como la **Fuerza de trabajo**. A continuación hablaremos de estos conceptos utilizando como ejemplo los datos de empleo en Chile en 2023. 
+Al reportar cifras de empleo se habla de conceptos tales como **Personas en Edad de Trabajar**,  **Fuerza de trabajo**, **Ocupados** y **Desocupados**. A continuación hablaremos de estos conceptos utilizando como ejemplo los datos de empleo en Chile en 2023. 
 
 <div class="card">
 <h2>Distribución población</h2>
@@ -13,7 +13,7 @@ Al reportar cifras de empleo se habla de conceptos tales como la **Fuerza de tra
 <div>${distribucionCifras3({data:data2023, width:640, stage:0})}</div>
 </div><!--card-->
 
-El 2023 en Chile había una población total de (${d3.format(".3s")(data2023.TOTAL)}), pero se considera a quienes tienen 15 años o más como **Personas en Edad de Trabajar**.  En 2023 en Chile eran (${d3.format(".3s")(data2023.PET)}), un ${d3.format(".1%")(data2023.PET/data2023.TOTAL)} de la población total.
+El 2023 en Chile había una población total de (${d3.format(".2s")(data2023.TOTAL)}), pero se considera a quienes tienen 15 años o más como **Personas en Edad de Trabajar**.  En 2023 en Chile eran (${d3.format(".2s")(data2023.PET)}), un ${d3.format(".1%")(data2023.PET/data2023.TOTAL)} de la población total.
 
 
 <div class="card">
@@ -26,9 +26,9 @@ El 2023 en Chile había una población total de (${d3.format(".3s")(data2023.TOT
 
 En las Personas en Edad de Trabajar existe un grupo que se clasifica como **Personas Inactivas**.  
 
-Son personas que que no están buscando trabajo, como estudiantes, jubilados, o personas dedicadas a labores del hogar de forma exclusiva. En 2023 en Chile eran ${d3.format(".3s")(data2023.PET- data2023.FT)} personas.
+Son personas que que no están buscando trabajo, como estudiantes, jubilados, o personas dedicadas a labores del hogar de forma exclusiva. En 2023 en Chile eran ${d3.format(".2s")(data2023.PET- data2023.FT)} personas.
 
-El resto, la **Fuerza de Trabajo**, incluye a todas las personas en edad y capacidad de trabajar que están disponibles para trabajar, es decir, las que están empleadas o en busca de empleo. En 2023 en Chile eran ${d3.format(".3s")(data2023.FT)}, un ${d3.format(".1%")(data2023.FT/data2023.PET)} de las Personas en Edad de Trabajar.
+El resto, la **Fuerza de Trabajo**, incluye a todas las personas en edad y capacidad de trabajar que están disponibles para trabajar, es decir, las que están empleadas o en busca de empleo. En 2023 en Chile eran ${d3.format(".2s")(data2023.FT)}, un ${d3.format(".1%")(data2023.FT/data2023.PET)} de las Personas en Edad de Trabajar.
 
 <div class="card">
 <h2>Distribución población</h2>
@@ -39,9 +39,9 @@ El resto, la **Fuerza de Trabajo**, incluye a todas las personas en edad y capac
 
 En la Fuerza de Trabajo hay **personas ocupadas** y **personas desocupadas**.
 
-Las **personas ocupadas** son aquellas que están trabajando y en 2023 en Chile eran **${d3.format(".3s")(data2023.O)}**, un **${d3.format(".1%")(data2023.O/data2023.PET)} de las personas en edad de trabajar**.  Esta es la cifra que se reporta como **tasa de ocupación**.
+Las **personas ocupadas** son aquellas que están trabajando y en 2023 en Chile eran **${d3.format(".2s")(data2023.O)}**, un **${d3.format(".1%")(data2023.O/data2023.PET)} de las personas en edad de trabajar**.  Esta es la cifra que se reporta como **tasa de ocupación**.
 
-Las **personas desocupadas** son aquellas que no están trabajando pero están disponibles y buscando empleo activamente. En 2023 en Chile eran **${d3.format(".3s")(data2023.DO)}**, un **${d3.format(".1%")(data2023.DO/data2023.FT)} de las fuerza de trabajo**. Esta es la cifra que se reporta como **tasa de desocupación**.
+Las **personas desocupadas** son aquellas que no están trabajando pero están disponibles y buscando empleo activamente. En 2023 en Chile eran **${d3.format(".2s")(data2023.DO)}**, un **${d3.format(".1%")(data2023.DO/data2023.FT)} de las fuerza de trabajo**. Esta es la cifra que se reporta como **tasa de desocupación**.
 
 <div class="card">
 <h2>Distribución población</h2>

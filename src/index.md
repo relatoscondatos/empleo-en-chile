@@ -7,9 +7,7 @@ sql:
 
 Las cifras de empleo evolucionan con el tiempo. La población total crece, pero los distintos grupos varian sus tamaños absolutos y relativos. El siguiente gráfico muestra cifras para el trimestre ${etiquetasTrimestres[mesReferencia]} entre 2017 y ${añoReferencia}.
 
-La pandemia en 2020 generó una importante reducción en las personas ocupadas. La tasa de ocupación en el trimestre ${etiquetasTrimestres[mesReferencia]} llegó a un **${d3.format(".1%")(registro2020.O / registro2020.PET)} en 2020** vs un **${d3.format(".1%")(registro2019.O / registro2019.PET) } en 2019**.
-
-El empleo ha aumentado progresivamente desde la pandemia, llegando  a una tasa de ocupación de un **${d3.format(".1%")(registroReferencia.O / registroReferencia.PET) } en ${añoReferencia}**
+Dado que hay variaciones estacionales durante el año, para analizar los cambios comparamos el mismo trimestre de distintos años. 
 
 <div class="card">
 <h2>Evolución de cifras</h2>
@@ -17,9 +15,20 @@ El empleo ha aumentado progresivamente desde la pandemia, llegando  a una tasa d
 <div>${buildChart_evolucionPorMes_bars({data:datosEmpleo, añoReferencia:añoReferencia, mesReferencia: mesReferencia})}</div>
 </div><!--card-->
 
+La pandemia en 2020 generó una importante reducción en las personas ocupadas.  
+
+La tasa de ocupación (proporción de Ocupados dentro de Personas en Edad de Trabajar) en el trimestre ${etiquetasTrimestres[mesReferencia]} bajó de un **${d3.format(".1%")(registro2019.O / registro2019.PET) } en 2019** a un **${d3.format(".1%")(registro2020.O / registro2020.PET)} en 2020**.
+
+Desde 2020 ha aumentado progresivamente llegando a un **${d3.format(".1%")(registroReferencia.O / registroReferencia.PET) } en ${añoReferencia}**, pero aún no se llega a los niveles previos a la pandemia.
+
+```js
+graficoOcupacion
+```
+
+
 ## Composición de las personas ocupadas
 
-El total de **personas ocupadas** varía en el tiempo. Para el trimestre ${etiquetasTrimestres[mesReferencia]} antes de la pandemia, **en 2019, había ${d3.format(".3s")(registro2019.O)}** de personas ocupadas y en **${añoReferencia} se reportan ${d3.format(".3s")(registroReferencia.O)}**. 
+El total de **personas ocupadas** varía en el tiempo. Para el trimestre ${etiquetasTrimestres[mesReferencia]} de **2019, antes de la pandemia, había ${d3.format(".2s")(registro2019.O)}** de personas ocupadas y en **${añoReferencia} se reportan ${d3.format(".2s")(registroReferencia.O)}**. 
 
 A continuación veremos cómo se descompone ese total de ocupados en distintos sub grupos utilizando como referencia los datos del trimestre ${etiquetasTrimestres[mesReferencia]} en los respectivos años.
 
@@ -60,9 +69,9 @@ Cabe hacer notar que en 2024 se desarrolló el CENSO Nacional y las cifras de em
 
 Las cifras de empleo también se ven afectadas por cambios en la **población extranjera** en Chile.
 
-La proporción de personas extranjeras entre los ocupados aumento de manera importante de un **${d3.format(".1%")(registro2017.extranjeros / registro2017.O)} en 2017** a un **${d3.format(".1%")(registro2021.extranjeros / registro2021.O)} en 2021**.
+La proporción de personas extranjeras entre los ocupados aumentó de manera importante de un **${d3.format(".1%")(registro2017.extranjeros / registro2017.O)} en 2017** a un **${d3.format(".1%")(registro2021.extranjeros / registro2021.O)} en 2021**.
 
-A partir de 2021 la proporción de extranjeros muestra cierta estabilidad, llegando a un **${d3.format(".1%")(registroReferencia.extranjeros / registroReferencia.O)} en ${añoReferencia}**
+A partir de 2021 la proporción de extranjeros no aumenta, llegando a un **${d3.format(".1%")(registroReferencia.extranjeros / registroReferencia.O)} en ${añoReferencia}**.
 
 <div class="card">
 <h2>Evolución de cifras</h2>
@@ -72,7 +81,7 @@ A partir de 2021 la proporción de extranjeros muestra cierta estabilidad, llega
 
 La mayoría de las personas ocupadas son hombres.
 
-La **proporción de mujeres** en el empleo disminuyó en la pandemia a un **${d3.format(".1%")(registro2020.mujeres / registro2020.O)} en 2020** y ha aumentado desde esa fecha. Pero la cifra en **${añoReferencia} (${d3.format(".1%")(registroReferencia.mujeres / registroReferencia.O)})** no es muy superior a la que se observaba en **2019 (${d3.format(".1%")(registro2019.mujeres / registro2019.O)})**
+La **proporción de mujeres** en el empleo disminuyó en la pandemia, llegando a un **${d3.format(".1%")(registro2020.mujeres / registro2020.O)} en 2020** y ha aumentado desde esa fecha. Pero la cifra en **${añoReferencia} (${d3.format(".1%")(registroReferencia.mujeres / registroReferencia.O)})** no es muy superior a la que se observaba en **2019 (${d3.format(".1%")(registro2019.mujeres / registro2019.O)})**
 
 
 <div class="card">
@@ -497,8 +506,90 @@ function buildChart_evolucionPorMes_subgrupos_bars({ dataPlot = [], añoReferenc
     ]
   });
 }
+```
+
+```js
+const graficoOcupacion = (function() {
+
+  const datosOcupacion = _.chain(datosEmpleo)
+  .filter(d => d.mes == mesReferencia)
+  .map(d => ({
+    año: d.año,
+    tasaOcupacion: d.O / d.PET
+  }))
+  .value()
+
+  const maxOcupacion = _.chain(datosOcupacion)
+    .map(d => d.tasaOcupacion)
+    .max()
+    .value() 
+
+  const minOcupacion = _.chain(datosOcupacion)
+    .map(d => d.tasaOcupacion)
+    .min()
+    .value()
+
+  return Plot.plot({
+    caption: fuenteINE,
+    marginLeft: 40,
+    marginTop: 40,
+
+    x:{
+      inset:40,
+      grid:true
+    },
+
+    y:{
+      zero:false,
+      tickFormat: d => d3.format(".1%")(d),
+      domain:[
+        minOcupacion -0.1 < 0 ? 0 : minOcupacion -0.1, 
+        maxOcupacion +0.1 > 1 ? 1 : maxOcupacion +0.1
+      ],
+      label: "Tasa de Ocupación",
+      grid:true
+    },
+
+    marks: [
+      // Create an area plot with stacking for the data
+      Plot.lineY(
+        datosOcupacion,
+        {
+          y: "tasaOcupacion",
+          x: "año",
+          stroke: d => "ocupación",
+          strokeWidth:3
+        }
+      ),
+      Plot.dot(
+        datosOcupacion,
+        {
+          y: "tasaOcupacion",
+          x: "año",
+          stroke: d => "ocupación",
+          strokeWidth:3
+        }
+      ),
+      Plot.text(
+        datosOcupacion,
+        {
+          y: "tasaOcupacion",
+          x: "año",
+          text: d => d3.format(".1%")(d.tasaOcupacion),
+          dy:-15,
+          fontSize:14,
+          fontWeight:"bold"
+        }
+      )
+    ]
+  })
+
+})()
 
 ```
+
+
+
 
 ```js
 // Import required modules and configurations
