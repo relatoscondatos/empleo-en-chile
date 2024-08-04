@@ -1,20 +1,21 @@
 // See https://observablehq.com/framework/config for documentation.
 export default {
   // The project’s title; used in the sidebar and webpage titles.
-  title: "Edad de defunción en Chile",
+  title: "Empleo en Chile",
 
   // The pages and sections in the sidebar. If you don’t specify this option,
   // all pages will be listed in alphabetical order. Listing pages explicitly
   // lets you organize them into sections and have unlisted pages.
-  // pages: [
-  //   {
-  //     name: "Examples",
-  //     pages: [
-  //       {name: "Dashboard", path: "/example-dashboard"},
-  //       {name: "Report", path: "/example-report"}
-  //     ]
-  //   }
-  // ],
+  pages: [
+    {
+      name: "Empleo en Chile",
+      pages: [
+        {name: "Actualización Trimestral (Abril-Mayo-Junio) 2024", path: "/"},
+        {name: "Conceptos claves", path: "/empleo-conceptos-claves"},
+        {name: "Comparación internacional", path: "/comparacion-internacional"}
+      ]
+    }
+  ],
 
   // Content to add to the head of the page, e.g. for a favicon:
   head: `
@@ -33,9 +34,9 @@ export default {
   theme: "default", // try "light", "dark", "slate", etc.
   header: 'Un relato con datos <img src="./favicon.ico" height="20px"> <a href="https://www.relatoscondatos.cl" target="_blank">www.relatoscondatos.cl</a> ', // what to show in the header (HTML)
   footer: 'Relatos con datos <i class="fas fa-envelope"></i> <a href="mailto:contacto@relatoscondatos.cl">contacto@relatoscondatos.cl</a>', // what to show in the footer (HTML)
-  sidebar: false, // whether to show the sidebar
+  sidebar: true, // whether to show the sidebar
   toc: {show:true, label:"Contenido"}, // whether to show the table of contents
-  pager: false, // whether to show previous & next links in the footer
+  pager: true, // whether to show previous & next links in the footer
   // output: "dist", // path to the output root for build
   // search: true, // activate search
   // linkify: true, // convert URLs in Markdown to links
