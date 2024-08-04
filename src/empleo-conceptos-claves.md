@@ -68,6 +68,27 @@ const fuenteINE= `Fuente de datos: Encuesta Nacional de Empleo, INE, Chile`;
  */
 function distribucionCifras3({data={}, width=640, stage=3} = {}) {
 
+  const colorRange = d3.schemeObservable10;
+
+  const labels = [
+    "Ocupados",
+    "Desocupados",
+    "Fuerza de Trabajo",
+    "Inactivas",
+    "En Edad de Trabajar",
+    "Menores de 15 años",
+    "Población Total"
+  ]
+
+  function textColor(label) {
+    const pos = labels.indexOf(label);
+    const color = colorRange[pos];
+    const {r, g, b} = d3.rgb(color);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000 / 255; // returns values between 0 and 1
+
+    return yiq >= 0.6 ? "#111" : "white"
+  }
+
   // Calculate the maximum value for the x-axis domain
   const maxValue = data.TOTAL
 
@@ -122,15 +143,8 @@ function distribucionCifras3({data={}, width=640, stage=3} = {}) {
     marginLeft: 40,
     marginRight: 0,
     color:{
-      domain: [
-        "Ocupados",
-        "Desocupados",
-        "Fuerza de Trabajo",
-        "Inactivas",
-        "En Edad de Trabajar",
-        "Menores de 15 años",
-        "Población Total"
-      ]
+      domain: labels,
+      range: colorRange
     },
     y: { 
       tickFormat: "s", 
@@ -162,7 +176,8 @@ function distribucionCifras3({data={}, width=640, stage=3} = {}) {
           y: "personas",
           z: "tipo",
           text:d => `${d.tipo}\n${d3.format(".3s")(d.personas)}`,
-          fill: d => d.tipo.match(/Ocupados/) ? "white" : "black"
+          //fill: d => d.tipo.match(/Ocupados/) ? "white" : "black"
+          fill: d => textColor(d.tipo)
         })
       )
     ]

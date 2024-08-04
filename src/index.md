@@ -410,12 +410,23 @@ function buildChart_evolucionPorMes_bars({ data = [], añoReferencia = 2024, mes
  */
 function buildChart_evolucionPorMes_subgrupos_bars({ dataPlot = [], añoReferencia = 2024, mesReferencia = 1 } = {}) {
   
+  const colorRange = d3.schemeObservable10;
+
   const labels = _.chain(dataPlot)
     .uniqBy(d => d.tipo)
     .sortBy(d => d.order)
     .reverse()
     .map(d => d.tipo)
     .value()
+
+  function textColor(label) {
+    const pos = labels.indexOf(label);
+    const color = colorRange[pos];
+    const {r, g, b} = d3.rgb(color);
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000 / 255; // returns values between 0 and 1
+
+    return yiq >= 0.6 ? "#111" : "white"
+  }
 
   // Filter data for the last month of the reference year
   const dataPlotLast = _.chain(dataPlot).filter((d) => d.mes == mesReferencia && d.año == añoReferencia).value();
@@ -437,7 +448,8 @@ function buildChart_evolucionPorMes_subgrupos_bars({ dataPlot = [], añoReferenc
       label:"Personas"
     },
     color: {
-      domain: labels
+      domain: labels,
+      range: colorRange
     },
         style :{fontSize:12},
 
@@ -461,7 +473,8 @@ function buildChart_evolucionPorMes_subgrupos_bars({ dataPlot = [], añoReferenc
         Plot.stackY({
           y: "personas",
           x: "date",
-          fill: (d) => (d.tipo == labels[0] ? "white" : "black"),
+          // fill: (d) => (d.tipo == labels[0] ? "white" : "black"),
+          fill: d => textColor(d.tipo),
           text: (d) => `${d3.format(".3s")(d.personas)}\n${d3.format(".1%")(d.percentage)}`,
           textAnchor: "middle",
           dx: -1
