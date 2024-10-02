@@ -3,9 +3,10 @@ sql:
   ene_cambio_anual: data/ene_cambio_anual.parquet
 ---
 
+
 ```js
 const añoReferencia = 2024
-const mesReferencia = 7
+const mesReferencia = 5
 ````
 
 # Empleo en Chile - Actualización Trimestral (${etiquetasTrimestres[mesReferencia]}) ${añoReferencia}
@@ -54,7 +55,7 @@ La proporción de ocupación informal **en 2019 era un ${d3.format(".1%")(regist
 
 Esta proporción disminuyó en la pandemia bajando a un **${d3.format(".1%")(registro2020.ocupacion_informal / registro2020.O)} en 2020** ya que muchos trabajadores informales pasaron a ser inactivos.  
 
-La cifra ha aumentando llegando a un **${d3.format(".1%")(registroReferencia.ocupacion_informal / registroReferencia.O)} en ${añoReferencia}**, pero aún se encuentra más baja que antes de la pandemia.
+La cifra ha ido aumentando progresivamente llegando a un **${d3.format(".1%")(registroReferencia.ocupacion_informal / registroReferencia.O)} en ${añoReferencia}**
 
 <div class="card">
 <h2>Evolución de cifras</h2>
@@ -87,6 +88,10 @@ La proporción de personas extranjeras entre los ocupados aumentó de manera imp
 
 A partir de 2021 la proporción de extranjeros no aumenta, llegando a un **${d3.format(".1%")(registroReferencia.extranjeros / registroReferencia.O)} en ${añoReferencia}**.
 
+```js
+display(registro2017)
+```
+
 <div class="card">
 <h2>Evolución de cifras</h2>
 <h3>Se indican cifras para trimestre ${etiquetasTrimestres[mesReferencia]} de cada año</h3>
@@ -112,6 +117,7 @@ FROM ene_cambio_anual
 ```
 
 ```js
+
 const fuenteINE= `Fuente de datos: Encuesta Nacional de Empleo, INE, Chile`;
 
 // Get the label for the selected reference month
@@ -139,7 +145,7 @@ const dataPlotEvolucionOcupados = _.chain(datosEmpleo)
         date: moment(`${d.año}-${d.mes}`, "YYYY-M").toDate(),
         año: d.año,
         mes: d.mes,
-        tipo: "Personas Ocupadas",
+        tipo: "Ocupados",
         personas: d.O,
         percentage: d.O/d.O,
         order:1,

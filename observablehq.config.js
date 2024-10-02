@@ -6,12 +6,22 @@ export default {
   // The pages and sections in the sidebar. If you don’t specify this option,
   // all pages will be listed in alphabetical order. Listing pages explicitly
   // lets you organize them into sections and have unlisted pages.
+  
+  home: {},
+ 
   pages: [
     {
-      name: "Empleo en Chile",
+      name: "Actualizaciones trimestrales",
       pages: [
-        {name: "Actualización Trimestral (Abril-Mayo-Junio) 2024", path: "/"},
-        {name: "Conceptos claves", path: "/empleo-conceptos-claves"},
+        {name: "Abril-Mayo-Junio 2024", path: "/empleo-en-chile-AMJ"},
+        {name: "Mayo-Junio-Junlio 2024", path: "/empleo-en-chile-MJJ"},
+        {name: "Junio-Junlio-Agosto 2024", path: "/"},
+      ]
+    },
+    {
+      name: "Conceptos y panorama global",
+      pages: [
+         {name: "Conceptos claves", path: "/empleo-conceptos-claves"},
         {name: "Comparación internacional", path: "/comparacion-internacional"}
       ]
     }

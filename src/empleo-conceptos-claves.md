@@ -41,12 +41,19 @@ En la Fuerza de Trabajo hay **personas ocupadas** y **personas desocupadas**.
 
 Las **personas ocupadas** son aquellas que están trabajando y en 2023 en Chile eran **${d3.format(".2s")(data2023.O)}**, un **${d3.format(".1%")(data2023.O/data2023.PET)} de las personas en edad de trabajar**.  Esta es la cifra que se reporta como **tasa de ocupación**.
 
+<div class="card">
+<h2>Distribución población</h2>
+<h3>Año 2023</h3>
+<div>${distribucionCifras3({data:data2023, width:640, stage:3})}</div>
+</div><!--card-->
+
+
 Las **personas desocupadas** son aquellas que no están trabajando pero están disponibles y buscando empleo activamente. En 2023 en Chile eran **${d3.format(".2s")(data2023.DO)}**, un **${d3.format(".1%")(data2023.DO/data2023.FT)} de las fuerza de trabajo**. Esta es la cifra que se reporta como **tasa de desocupación**.
 
 <div class="card">
 <h2>Distribución población</h2>
 <h3>Año 2023</h3>
-<div>${distribucionCifras3({data:data2023, width:640, stage:3})}</div>
+<div>${distribucionCifras3({data:data2023, width:640, stage:4})}</div>
 </div><!--card-->
 
 
@@ -124,7 +131,8 @@ function distribucionCifras3({data={}, width=640, stage=3} = {}) {
    0: data_all.filter(d => d.tipo.match(/En Edad de Trabajar|Menores de 15 años|Población Tota|Fuerza de Trabajo|Inactivas|Ocupados|Desocupados/)),
    1: data_all.filter(d => d.tipo.match(/En Edad de Trabajar|Menores de 15 años|Población Tota/)),
    2: data_all.filter(d => d.tipo.match(/Fuerza de Trabajo|Inactivas|En Edad de Trabajar/)),
-   3: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo/))
+   3: data_all.filter(d => d.tipo.match(/En Edad de Trabajar|Ocupados|Desocupados|Fuerza de Trabajo/)),
+   4: data_all.filter(d => d.tipo.match(/Ocupados|Desocupados|Fuerza de Trabajo/))
 
   }
 
