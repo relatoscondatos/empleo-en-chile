@@ -5,7 +5,7 @@ sql:
 
 ```js
 const añoReferencia = 2024
-const mesReferencia = 9
+const mesReferencia = 8
 ````
 
 # Empleo en Chile - Actualización Trimestral (${etiquetasTrimestres[mesReferencia]}) ${añoReferencia}

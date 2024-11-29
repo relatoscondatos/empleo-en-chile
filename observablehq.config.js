@@ -13,9 +13,11 @@ export default {
     {
       name: "Actualizaciones trimestrales",
       pages: [
-        {name: "Abril-Mayo-Junio 2024", path: "/empleo-en-chile-AMJ"},
-        {name: "Mayo-Junio-Junlio 2024", path: "/empleo-en-chile-MJJ"},
-        {name: "Junio-Junlio-Agosto 2024", path: "/"},
+        {name: "Abril-Mayo-Junio 2024", path: "/empleo-en-chile-05-AMJ"},
+        {name: "Mayo-Junio-Julio 2024", path: "/empleo-en-chile-06-MJJ"},
+        {name: "Junio-Julio-Agosto 2024", path: "/empleo-en-chile-07-JJA"},
+        {name: "Julio-Agosto-Septiembre 2024", path: "/empleo-en-chile-08-JAS"},
+        {name: "Agosto-Septiembre-Octubre 2024", path: "/"},
       ]
     },
     {
